@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEditor;
 using System;
 using System.IO;
+using Tiled2Unity;
 
 public class TmxImporter : AssetPostprocessor
 {
@@ -39,14 +40,14 @@ public class TmxImporter : AssetPostprocessor
                 stream.Close();
 
                 // Also we check first file line
-                if (firstLine.Equals("MagicLine", StringComparison.OrdinalIgnoreCase))
+                //if (firstLine.Equals("MagicLine", StringComparison.OrdinalIgnoreCase))
                 {
                     ImportMyAsset(asset);
                 }
-                else
+                /*else
                 {
                     Debug.LogError("Cannot import \"" + asset + "\": bad format!");
-                }
+                }*/
             }
         }
     }
@@ -54,6 +55,13 @@ public class TmxImporter : AssetPostprocessor
     // Imports my asset from the file
     static void ImportMyAsset(string asset)
     {
+        TmxMap map = TmxMap.LoadFromFile(asset);
+
+        if (map.IsLoaded)
+        {
+            //TiledMapExporter exporter = new TiledMapExporter(map);
+            //exporter.Export(Application.dataPath);
+        }
         // Path to out new asset
         //string newPath = ConvertToInternalPath(asset);
 
@@ -67,7 +75,7 @@ public class TmxImporter : AssetPostprocessor
         //}
         //else
         //{
-            // return; // Uncommenting here means that when the original file is changed, changes are ignored
+        // return; // Uncommenting here means that when the original file is changed, changes are ignored
         //}
 
         // Here we load our asset from original file

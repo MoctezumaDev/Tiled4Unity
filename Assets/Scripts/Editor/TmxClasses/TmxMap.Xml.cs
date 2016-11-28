@@ -15,7 +15,7 @@ namespace Tiled2Unity
         public static TmxMap LoadFromFile(string tmxPath)
         {
             string fullTmxPath = Path.GetFullPath(tmxPath);
-            /*using (ChDir chdir = new ChDir(fullTmxPath))
+            //using (ChDir chdir = new ChDir(fullTmxPath))
             {
                 TmxMap tmxMap = new TmxMap();
                 XDocument doc = tmxMap.LoadDocument(fullTmxPath);
@@ -29,7 +29,7 @@ namespace Tiled2Unity
 
                 tmxMap.IsLoaded = true;
                 return tmxMap;
-            }*/
+            }
             return null;
         }
 
@@ -302,10 +302,16 @@ namespace Tiled2Unity
 
         private void ParseCompleted()
         {
-            /*// Every "layer type" instance needs its sort ordering figured out
+            // Every "layer type" instance needs its sort ordering figured out
             var layers = new List<TmxLayerBase>();
-            layers.AddRange(this.Layers);
-            layers.AddRange(this.ObjectGroups);
+            foreach(TmxLayerBase layer in Layers)
+            {
+                layers.Add(layer);
+            }
+            foreach(TmxLayerBase objectGroup in ObjectGroups)
+            {
+                layers.Add(objectGroup);
+            }
 
             // We sort by the XmlElementIndex because the order in the XML file is the implicity ordering or how tiles and objects are rendered
             layers = layers.OrderBy(l => l.XmlElementIndex).ToList();
@@ -315,7 +321,7 @@ namespace Tiled2Unity
                 TmxLayerBase layer = layers[i];
                 layer.SortingLayerName = layer.Properties.GetPropertyValueAsString("unity:sortingLayerName", "");
                 layer.SortingOrder = layer.Properties.GetPropertyValueAsInt("unity:sortingOrder", i);
-            }*/
+            }
         }
 
     }
