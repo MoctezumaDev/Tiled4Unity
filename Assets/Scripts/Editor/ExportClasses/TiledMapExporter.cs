@@ -6,13 +6,11 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using UnityEngine;
 
-/*namespace Tiled2Unity
+namespace Tiled2Unity
 {
     public partial class TiledMapExporter
     {
         private TmxMap tmxMap = null;
-        const string Version = "0.0.1";
-        const int Scale = 1;
 
         public TiledMapExporter(TmxMap tmxMap)
         {
@@ -37,14 +35,14 @@ using UnityEngine;
             List<XElement> assignMaterials = CreateAssignMaterialsElements();
 
             Console.WriteLine("Gathering prefab data ...");
-            XElement prefab = CreatePrefabElement();
+            //XElement prefab = CreatePrefabElement(); //TODO: Create prefabs
 
             // Create the Xml root and populate it
             Console.WriteLine("Writing as Xml ...");
 
-            XElement root = new XElement("Tiled2Unity", new XAttribute("version", version));
+            XElement root = new XElement("Tiled2Unity", new XAttribute("version", Tiled2Unity.Settings.Version));
             root.Add(assignMaterials);
-            root.Add(prefab);
+            //root.Add(prefab); //TODO: Create prefabs
             root.Add(importFiles);
 
             // Create the XDocument to save
@@ -92,11 +90,11 @@ using UnityEngine;
                 Group group = match.Groups["version"];
                 if (group.Success)
                 {
-                    if (Version != group.ToString())
+                    if (Tiled2Unity.Settings.Version != group.ToString())
                     {
                         StringBuilder builder = new StringBuilder();
                         builder.AppendFormat("Export/Import Version mismatch\n");
-                        builder.AppendFormat("  Tiled2Unity version   : {0}\n", Version);
+                        builder.AppendFormat("  Tiled2Unity version   : {0}\n", Tiled2Unity.Settings.Version);
                         builder.AppendFormat("  Unity Project version : {0}\n", group.ToString());
                         builder.AppendFormat("  (Did you forget to update Tiled2Unity scipts in your Unity project?)");
                         Console.WriteLine(builder.ToString());
@@ -110,7 +108,7 @@ using UnityEngine;
             doc.Save(pathToSave);
             Console.WriteLine("Succesfully exported: {0}\n  Vertex Scale = {1}\n  Object Type Xml = {2}",
                 pathToSave,
-                Scale,
+                Tiled2Unity.Settings.Scale,
                 "<none>");
         }
 
@@ -131,20 +129,20 @@ using UnityEngine;
             // Unity's coordinate sytem has y-up positive, y-down negative
             // Apply scaling
             Vector2 scaled = pt;
-            scaled.x *= Scale;
-            scaled.y *= Scale;
+            scaled.x *= Tiled2Unity.Settings.Scale;
+            scaled.y *= Tiled2Unity.Settings.Scale;
 
             // Have to watch for negative zero, ffs
             return new Vector2(scaled.x, scaled.y == 0 ? 0 : -scaled.y);
         }
 
-        public static Vector2 PointFToObjVertex(Vector2 pt)
+        public static Vector2 VectorToObjVertex(Vector2 pt)
         {
             // Note, we negate the x and y due to Wavefront's coordinate system
             // Applying scaling
             Vector2 scaled = pt;
-            scaled.x *= Scale;
-            scaled.y *= Scale;
+            scaled.x *= Tiled2Unity.Settings.Scale;
+            scaled.y *= Tiled2Unity.Settings.Scale;
 
             // Watch for negative zero, ffs
             return new Vector2(scaled.x == 0 ? 0 : -scaled.x, scaled.y == 0 ? 0 : -scaled.y);
@@ -185,4 +183,3 @@ using UnityEngine;
 
     } // end class
 } // end namepsace
-*/

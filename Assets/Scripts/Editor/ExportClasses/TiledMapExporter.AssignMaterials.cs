@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
 
-/*namespace Tiled2Unity
+namespace Tiled2Unity
 {
     partial class TiledMapExporter
     {
@@ -44,4 +44,3 @@ using System.Xml.Linq;
         }
     }
 }
-*/

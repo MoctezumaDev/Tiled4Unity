@@ -6,7 +6,7 @@ using System.Text;
 using System.Xml.Linq;
 
 
-/*namespace Tiled2Unity
+namespace Tiled2Unity
 {
     partial class TiledMapExporter
     {
@@ -82,7 +82,7 @@ using System.Xml.Linq;
                         string assetPath = image.AbsolutePath.Remove(0, exportToUnityProjectPath.Length);
                         assetPath = assetPath.TrimStart('\\');
                         assetPath = assetPath.TrimStart('/');
-                        Logger.WriteLine("InternalTexture : {0}", assetPath);
+                        Console.WriteLine("InternalTexture : {0}", assetPath);
 
                         // Path to texture in the asset directory
                         xmlInternalTexture.SetAttributeValue("assetPath", assetPath);
@@ -107,7 +107,7 @@ using System.Xml.Linq;
                         XElement xmlImportTexture = new XElement("ImportTexture");
 
                         // Note that compression is not available in Unity. Go with Base64 string. Blerg.
-                        Logger.WriteLine("ImportTexture : will import '{0}' to {1}", image.AbsolutePath, Path.Combine(exportToUnityProjectPath, "Textures"));
+                        Console.WriteLine("ImportTexture : will import '{0}' to {1}", image.AbsolutePath, Path.Combine(exportToUnityProjectPath, "Textures"));
 
                         // Is there a color key for transparency?
                         if (!String.IsNullOrEmpty(image.TransparentColor))
@@ -134,4 +134,3 @@ using System.Xml.Linq;
 
     } // end class
 } // end namespace
-*/
