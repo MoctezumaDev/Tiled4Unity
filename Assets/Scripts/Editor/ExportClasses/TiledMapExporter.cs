@@ -35,14 +35,14 @@ namespace Tiled2Unity
             List<XElement> assignMaterials = CreateAssignMaterialsElements();
 
             Console.WriteLine("Gathering prefab data ...");
-            //XElement prefab = CreatePrefabElement(); //TODO: Create prefabs
+            XElement prefab = CreatePrefabElement(); //TODO: Create prefabs
 
             // Create the Xml root and populate it
             Console.WriteLine("Writing as Xml ...");
 
             XElement root = new XElement("Tiled2Unity", new XAttribute("version", Tiled2Unity.Settings.Version));
             root.Add(assignMaterials);
-            //root.Add(prefab); //TODO: Create prefabs
+            root.Add(prefab); //TODO: Create prefabs
             root.Add(importFiles);
 
             // Create the XDocument to save
@@ -112,19 +112,20 @@ namespace Tiled2Unity
                 "<none>");
         }
 
-        public static Vector2 PointFToUnityVector_NoScale(Vector2 pt)
+        public static Vector2 VectorToUnityVector_NoScale(Vector2 pt)
         {
             // Unity's coordinate sytem has y-up positive, y-down negative
             // Have to watch for negative zero, ffs
             return new Vector2(pt.x, pt.y == 0 ? 0 : -pt.y);
         }
 
-        public static Vector2 PointFToUnityVector(float x, float y)
+        public static Vector2 VectorToUnityVector(float x, float y)
         {
-            return PointFToUnityVector(new Vector2(x, y));
+            return VectorToUnityVector(new Vector2(x, y));
         }
 
-        public static Vector2 PointFToUnityVector(Vector2 pt)
+        //TODO refactor the name of this method
+        public static Vector2 VectorToUnityVector(Vector2 pt)
         {
             // Unity's coordinate sytem has y-up positive, y-down negative
             // Apply scaling

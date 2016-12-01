@@ -1,10 +1,11 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using UnityEngine;
 
-/*namespace Tiled2Unity
+namespace Tiled2Unity
 {
     using ClipperPolygon = List<ClipperLib.IntPoint>;
     using ClipperPolygons = List<List<ClipperLib.IntPoint>>;
@@ -29,8 +30,8 @@ using System.Xml.Linq;
                 delegate(float x, float y)
                 {
                     // Transform point to Unity space
-                    PointF pointUnity3d = PointFToUnityVector_NoScale(new PointF(x, y));
-                    ClipperLib.IntPoint point = new ClipperLib.IntPoint(pointUnity3d.X, pointUnity3d.Y);
+                    Vector2 pointUnity3d = PointFToUnityVector_NoScale(new Vector2(x, y));
+                    ClipperLib.IntPoint point = new ClipperLib.IntPoint(pointUnity3d.x, pointUnity3d.y);
                     return point;
                 };
 
@@ -160,4 +161,4 @@ using System.Xml.Linq;
 
 
     } // end class
-} // end namespace]*/
+} // end namespace*/

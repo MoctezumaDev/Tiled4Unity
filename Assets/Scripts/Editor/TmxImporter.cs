@@ -59,8 +59,8 @@ public class TmxImporter : AssetPostprocessor
 
         if (map.IsLoaded)
         {
-            //TiledMapExporter exporter = new TiledMapExporter(map);
-            //exporter.Export(Application.dataPath);
+            TiledMapExporter exporter = new TiledMapExporter(map);
+            exporter.Export(Application.dataPath);
         }
         // Path to out new asset
         //string newPath = ConvertToInternalPath(asset);

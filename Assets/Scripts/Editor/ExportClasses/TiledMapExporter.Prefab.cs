@@ -4,9 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using UnityEngine;
 
 
-/*namespace Tiled2Unity
+namespace Tiled2Unity
 {
     partial class TiledMapExporter
     {
@@ -20,7 +21,7 @@ using System.Xml.Linq;
         }
 
         // Helper delegate to modify points by some transformation
-        private delegate void TransformVerticesFunc(PointF[] verts);
+        private delegate void TransformVerticesFunc(Vector2[] verts);
 
         private XElement CreatePrefabElement()
         {
@@ -88,7 +89,7 @@ using System.Xml.Linq;
                     if (layer.Visible == false)
                         continue;
 
-                    PointF offset = PointFToUnityVector(layer.Offset);
+                    Vector2 offset = VectorToUnityVector(layer.Offset);
 
                     // Is we're using depth shaders for our materials then each layer needs depth assigned to it
                     // The "depth" of the layer is negative because the Unity camera is along the negative z axis
@@ -104,8 +105,8 @@ using System.Xml.Linq;
                     XElement layerElement =
                         new XElement("GameObject",
                             new XAttribute("name", layer.Name),
-                            new XAttribute("x", offset.X),
-                            new XAttribute("y", offset.Y),
+                            new XAttribute("x", offset.x),
+                            new XAttribute("y", offset.y),
                             new XAttribute("z", depth_z));
 
                     if (layer.Ignore != TmxLayer.IgnoreSettings.Visual)
@@ -115,15 +116,16 @@ using System.Xml.Linq;
                         layerElement.Add(meshElements);
                     }
 
+                    //TODO
                     // Collision data for the layer
-                    if (layer.Ignore != TmxLayer.IgnoreSettings.Collision)
+                    /*if (layer.Ignore != TmxLayer.IgnoreSettings.Collision)
                     {
                         foreach (var collisionLayer in layer.CollisionLayers)
                         {
                             var collisionElements = CreateCollisionElementForLayer(collisionLayer);
                             layerElement.Add(collisionElements);
                         }
-                    }
+                    }*/
 
                     AssignUnityProperties(layer, layerElement, PrefabContext.TiledLayer);
                     AssignTiledProperties(layer, layerElement);
@@ -147,9 +149,9 @@ using System.Xml.Linq;
                     XElement gameObject = new XElement("GameObject", new XAttribute("name", objGroup.Name));
 
                     // Offset the object group
-                    PointF offset = PointFToUnityVector(objGroup.Offset);
-                    gameObject.SetAttributeValue("x", offset.X);
-                    gameObject.SetAttributeValue("y", offset.Y);
+                    Vector2 offset = VectorToUnityVector(objGroup.Offset);
+                    gameObject.SetAttributeValue("x", offset.x);
+                    gameObject.SetAttributeValue("y", offset.y);
 
                     // Is we're using depth shaders for our materials then each object group needs depth assigned to it
                     // The "depth" of the layer is negative because the Unity camera is along the negative z axis
@@ -195,10 +197,10 @@ using System.Xml.Linq;
                 XElement xmlObject = new XElement("GameObject", new XAttribute("name", tmxObject.GetNonEmptyName()));
 
                 // Transform object locaction into map space (needed for isometric and hex modes)
-                PointF xfPosition = TmxMath.ObjectPointFToMapSpace(this.tmxMap, tmxObject.Position);
-                PointF pos = PointFToUnityVector(xfPosition);
-                xmlObject.SetAttributeValue("x", pos.X);
-                xmlObject.SetAttributeValue("y", pos.Y);
+                Vector2 xfPosition = TmxMath.ObjectVector2ToMapSpace(this.tmxMap, tmxObject.Position);
+                Vector2 pos = VectorToUnityVector(xfPosition);
+                xmlObject.SetAttributeValue("x", pos.x);
+                xmlObject.SetAttributeValue("y", pos.y);
                 xmlObject.SetAttributeValue("rotation", tmxObject.Rotation);
 
                 AssignUnityProperties(tmxObject, xmlObject, PrefabContext.Object);
@@ -241,7 +243,7 @@ using System.Xml.Linq;
                     // TileObjects are off by a half-width in Isometric mode
                     if (this.tmxMap.Orientation == TmxMap.MapOrientation.Isometric)
                     {
-                        xmlObject.SetAttributeValue("x", pos.X - this.tmxMap.TileWidth * 0.5f * Tiled2Unity.Settings.Scale);
+                        xmlObject.SetAttributeValue("x", pos.x - this.tmxMap.TileWidth * 0.5f * Tiled2Unity.Settings.Scale);
                     }
 
                     // Apply z-cooridnate for use with the depth buffer
@@ -250,7 +252,7 @@ using System.Xml.Linq;
                     {
                         float mapLogicalHeight = this.tmxMap.MapSizeInPixels().Height;
                         float tileLogicalHeight = this.tmxMap.TileHeight;
-                        float logicalPos_y = (-pos.Y / Tiled2Unity.Settings.Scale) - tileLogicalHeight;
+                        float logicalPos_y = (-pos.y / Tiled2Unity.Settings.Scale) - tileLogicalHeight;
 
                         float depth_z = logicalPos_y / mapLogicalHeight * -1.0f;
                         xmlObject.SetAttributeValue("z", depth_z == -0 ? 0 : depth_z);
@@ -260,7 +262,7 @@ using System.Xml.Linq;
                 }
                 else
                 {
-                    Logger.WriteLine("Object '{0}' has been added for use with custom importers", tmxObject);
+                    Console.WriteLine("Object '{0}' has been added for use with custom importers", tmxObject);
                 }
 
                 if (objElement != null)
@@ -313,11 +315,11 @@ using System.Xml.Linq;
                     float scale = 1.0f;
                     if (context != PrefabContext.Root)
                     {
-                        Logger.WriteWarning("unity:scale only applies to map properties\n{0}", xml.ToString());
+                        Console.WriteLine("unity:scale only applies to map properties\n{0}", xml.ToString());
                     }
                     else if (!Single.TryParse(unityScale, out scale))
                     {
-                        Logger.WriteError("unity:scale property value '{0}' could not be converted to a float", unityScale);
+                        Console.WriteLine("unity:scale property value '{0}' could not be converted to a float", unityScale);
                     }
                     else
                     {
@@ -334,11 +336,11 @@ using System.Xml.Linq;
                     bool resource = false;
                     if (context != PrefabContext.Root)
                     {
-                        Logger.WriteWarning("unity:resource only applies to map properties\n{0}", xml.ToString());
+                        Console.WriteLine("unity:resource only applies to map properties\n{0}", xml.ToString());
                     }
                     else if (!Boolean.TryParse(unityResource, out resource))
                     {
-                        Logger.WriteError("unity:resource property value '{0}' could not be converted to a boolean", unityResource);
+                        Console.WriteLine("unity:resource property value '{0}' could not be converted to a boolean", unityResource);
                     }
                     else
                     {
@@ -354,14 +356,14 @@ using System.Xml.Linq;
                 {
                     if (context != PrefabContext.Root)
                     {
-                        Logger.WriteWarning("unity:resourcePath only applies to map properties\n{0}", xml.ToString());
+                        Console.WriteLine("unity:resourcePath only applies to map properties\n{0}", xml.ToString());
                     }
                     else
                     {
                         bool isInvalid = Path.GetInvalidPathChars().Any(c => unityResourcePath.Contains(c));
                         if (isInvalid)
                         {
-                            Logger.WriteError("unity:resourcePath has invalid path characters: {0}", unityResourcePath);
+                            Console.WriteLine("unity:resourcePath has invalid path characters: {0}", unityResourcePath);
                         }
                         else
                         {
@@ -379,7 +381,7 @@ using System.Xml.Linq;
                     bool isTrigger = false;
                     if (!Boolean.TryParse(unityIsTrigger, out isTrigger))
                     {
-                        Logger.WriteError("unity:isTrigger property value '{0}' cound not be converted to a boolean", unityIsTrigger);
+                        Console.WriteLine("unity:isTrigger property value '{0}' cound not be converted to a boolean", unityIsTrigger);
                     }
                     else
                     {
@@ -424,7 +426,7 @@ using System.Xml.Linq;
                           select p.Key;
             foreach (var p in unknown)
             {
-                Logger.WriteWarning("Unknown unity property '{0}' in GameObject '{1}'", p, tmxHasProperties.ToString());
+                Console.WriteLine("Unknown unity property '{0}' in GameObject '{1}'", p, tmxHasProperties.ToString());
             }
         }
 
@@ -472,12 +474,12 @@ using System.Xml.Linq;
         {
             if (this.tmxMap.Orientation == TmxMap.MapOrientation.Isometric)
             {
-                Logger.WriteError("Collision ellipse in Object Layer '{0}' is not supported in Isometric maps: {1}", objGroupName, tmxEllipse);
+                Console.WriteLine("Collision ellipse in Object Layer '{0}' is not supported in Isometric maps: {1}", objGroupName, tmxEllipse);
                 return null;
             }
             else if (!tmxEllipse.IsCircle())
             {
-                Logger.WriteError("Collision ellipse in Object Layer '{0}' is not a circle: {1}", objGroupName, tmxEllipse);
+                Console.WriteLine("Collision ellipse in Object Layer '{0}' is not a circle: {1}", objGroupName, tmxEllipse);
                 return null;
             }
             else
@@ -493,11 +495,11 @@ using System.Xml.Linq;
         private XElement CreatePolygonColliderElement(TmxObjectPolygon tmxPolygon)
         {
             var points = from pt in TmxMath.GetPointsInMapSpace(this.tmxMap, tmxPolygon)
-                       select PointFToUnityVector(pt);
+                       select VectorToUnityVector(pt);
 
             XElement polygonCollider =
                 new XElement("PolygonCollider2D",
-                    new XElement("Path", String.Join(" ", points.Select(pt => String.Format("{0},{1}", pt.X, pt.Y)))));
+                    new XElement("Path", String.Join(" ", points.Select(pt => String.Format("{0},{1}", pt.x, pt.y)).ToArray<string>())));
 
             return polygonCollider;
         }
@@ -506,11 +508,11 @@ using System.Xml.Linq;
         {
             // The points need to be transformed into unity space
             var points = from pt in TmxMath.GetPointsInMapSpace(this.tmxMap, tmxPolyline)
-                         select PointFToUnityVector(pt);
+                         select VectorToUnityVector(pt);
 
             XElement edgeCollider =
                 new XElement("EdgeCollider2D",
-                    new XElement("Points", String.Join(" ", points.Select(pt => String.Format("{0},{1}", pt.X, pt.Y)))));
+                    new XElement("Points", String.Join(" ", points.Select(pt => String.Format("{0},{1}", pt.x, pt.y)).ToArray<string>())));
 
             return edgeCollider;
         }
@@ -570,8 +572,8 @@ using System.Xml.Linq;
                     if (objElement != null)
                     {
                         // Objects can be offset (and we need to make up for the bottom-left corner being the origin in a TileObject)
-                        objElement.SetAttributeValue("offsetX", tmxObject.Position.X * Tiled2Unity.Settings.Scale);
-                        objElement.SetAttributeValue("offsetY", (tmxObjectTile.Size.Height - tmxObject.Position.Y) * Tiled2Unity.Settings.Scale);
+                        objElement.SetAttributeValue("offsetX", tmxObject.Position.x * Tiled2Unity.Settings.Scale);
+                        objElement.SetAttributeValue("offsetY", (tmxObjectTile.Size.Height - tmxObject.Position.y) * Tiled2Unity.Settings.Scale);
 
                         xmlTileObject.Add(objElement);
                     }
@@ -612,4 +614,4 @@ using System.Xml.Linq;
 
 
     } // end class
-} // end namespace*/
+} // end namespace
