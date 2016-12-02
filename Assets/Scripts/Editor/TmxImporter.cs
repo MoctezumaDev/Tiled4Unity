@@ -60,7 +60,7 @@ public class TmxImporter : AssetPostprocessor
         if (map.IsLoaded)
         {
             TiledMapExporter exporter = new TiledMapExporter(map);
-            exporter.Export(Application.dataPath);
+            exporter.Export(Application.dataPath+ "\\Tiled2Unity");
         }
         // Path to out new asset
         //string newPath = ConvertToInternalPath(asset);

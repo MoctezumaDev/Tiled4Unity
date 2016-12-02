@@ -116,16 +116,16 @@ namespace Tiled2Unity
                         layerElement.Add(meshElements);
                     }
 
-                    //TODO
+                    
                     // Collision data for the layer
-                    /*if (layer.Ignore != TmxLayer.IgnoreSettings.Collision)
+                    if (layer.Ignore != TmxLayer.IgnoreSettings.Collision)
                     {
                         foreach (var collisionLayer in layer.CollisionLayers)
                         {
                             var collisionElements = CreateCollisionElementForLayer(collisionLayer);
                             layerElement.Add(collisionElements);
                         }
-                    }*/
+                    }
 
                     AssignUnityProperties(layer, layerElement, PrefabContext.TiledLayer);
                     AssignTiledProperties(layer, layerElement);
