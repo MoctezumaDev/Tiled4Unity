@@ -1,4 +1,4 @@
-﻿/*using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,7 +30,7 @@ namespace Tiled2Unity
                 delegate(float x, float y)
                 {
                     // Transform point to Unity space
-                    Vector2 pointUnity3d = PointFToUnityVector_NoScale(new Vector2(x, y));
+                    Vector2 pointUnity3d = VectorToUnityVector_NoScale(new Vector2(x, y));
                     ClipperLib.IntPoint point = new ClipperLib.IntPoint(pointUnity3d.x, pointUnity3d.y);
                     return point;
                 };
@@ -38,7 +38,7 @@ namespace Tiled2Unity
             LayerClipper.ProgressFunc progFunc =
                 delegate(string prog)
                 {
-                    Logger.WriteLine(prog);
+                    Console.WriteLine(prog);
                 };
 
             ClipperLib.PolyTree solution = LayerClipper.ExecuteClipper(this.tmxMap, layer, xfFunc, progFunc);
@@ -52,7 +52,7 @@ namespace Tiled2Unity
                 warning.AppendLine("  Check polygon/rectangle objects in Tile Collision Editor in Tiled and use 'Snap to Grid' or 'Snap to Fine Grid'.");
                 warning.AppendLine("  You want colliders to be set up so they can be merged with colliders on neighboring tiles, reducing path count considerably.");
                 warning.AppendLine("  In some cases the size of the map may need to be reduced.");
-                Logger.WriteWarning(warning.ToString());
+                Console.WriteLine(warning.ToString());
             }
 
             // Add our polygon and edge colliders
@@ -99,7 +99,7 @@ namespace Tiled2Unity
             // Each PointF array is a polygon with a single path
             foreach (var pointfArray in polygons)
             {
-                string data = String.Join(" ", pointfArray.Select(pt => String.Format("{0},{1}", pt.X * Tiled2Unity.Settings.Scale, pt.Y * Tiled2Unity.Settings.Scale)));
+                string data = String.Join(" ", pointfArray.Select(pt => String.Format("{0},{1}", pt.x * Tiled2Unity.Settings.Scale, pt.y * Tiled2Unity.Settings.Scale)).ToArray<string>());
                 XElement pathElement = new XElement("Path", data);
 
                 XElement polyColliderElement = new XElement("PolygonCollider2D", pathElement);
@@ -118,7 +118,7 @@ namespace Tiled2Unity
             List<XElement> pathElements = new List<XElement>();
             foreach (var path in polygons)
             {
-                string data = String.Join(" ", path.Select(pt => String.Format("{0},{1}", pt.X * Tiled2Unity.Settings.Scale, pt.Y * Tiled2Unity.Settings.Scale)));
+                string data = String.Join(" ", path.Select(pt => String.Format("{0},{1}", pt.X * Tiled2Unity.Settings.Scale, pt.Y * Tiled2Unity.Settings.Scale)).ToArray<string>());
                 XElement pathElement = new XElement("Path", data);
                 pathElements.Add(pathElement);
             }
@@ -137,7 +137,7 @@ namespace Tiled2Unity
             var combined = CombineLineSegments(lines);
             foreach (var points in combined)
             {
-                string data = String.Join(" ", points.Select(pt => String.Format("{0},{1}", pt.X * Tiled2Unity.Settings.Scale, pt.Y * Tiled2Unity.Settings.Scale)));
+                string data = String.Join(" ", points.Select(pt => String.Format("{0},{1}", pt.X * Tiled2Unity.Settings.Scale, pt.Y * Tiled2Unity.Settings.Scale)).ToArray<string>());
                 XElement edgeCollider =
                     new XElement("EdgeCollider2D",
                         new XElement("Points", data));
@@ -161,4 +161,4 @@ namespace Tiled2Unity
 
 
     } // end class
-} // end namespace*/
+} // end namespace

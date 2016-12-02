@@ -4378,7 +4378,7 @@ namespace Tiled2Unity.ClipperLib
         }
         //------------------------------------------------------------------------------
 
-        internal static DoublePoint GetUnitNormal(IntPoint pt1, IntPoint pt2)
+        public static DoublePoint GetUnitNormal(IntPoint pt1, IntPoint pt2)
         {
             double dx = (pt2.X - pt1.X);
             double dy = (pt2.Y - pt1.Y);
