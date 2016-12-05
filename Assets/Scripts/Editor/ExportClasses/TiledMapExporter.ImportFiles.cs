@@ -79,7 +79,7 @@ namespace Tiled2Unity
                         XElement xmlInternalTexture = new XElement("InternalTexture");
 
                         // The path to the texture will be WRT to the Unity project root
-                        string assetPath = image.AbsolutePath.Remove(0, exportToUnityProjectPath.Length);
+                        string assetPath = image.AbsolutePath;
                         assetPath = assetPath.TrimStart('\\');
                         assetPath = assetPath.TrimStart('/');
                         Console.WriteLine("InternalTexture : {0}", assetPath);
@@ -101,6 +101,7 @@ namespace Tiled2Unity
 
                         elements.Add(xmlInternalTexture);
                     }
+                    //TODO external images, we might not support them
                     else
                     {
                         // The texture needs to be imported into the Unity project (under Tiled2Unity's care)

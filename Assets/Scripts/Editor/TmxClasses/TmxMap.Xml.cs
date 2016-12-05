@@ -12,16 +12,31 @@ namespace Tiled2Unity
     // Partial class methods for creating TmxMap data from xml files/data
     partial class TmxMap
     {
+        private string _projectPath;
+
+        protected static string GetProjectPath(string tmxPath)
+        {
+            string projectPath = "";
+            int index = tmxPath.LastIndexOf("/");
+            if (index > 0)
+            {
+                projectPath = tmxPath.Substring(0, index + 1); 
+            }
+            return projectPath;
+        }
+
         public static TmxMap LoadFromFile(string tmxPath)
         {
             string fullTmxPath = Path.GetFullPath(tmxPath);
+            string projectPath = GetProjectPath(tmxPath);
+
             //using (ChDir chdir = new ChDir(fullTmxPath))
             {
                 TmxMap tmxMap = new TmxMap();
                 XDocument doc = tmxMap.LoadDocument(fullTmxPath);
 
                 tmxMap.Name = Path.GetFileNameWithoutExtension(fullTmxPath);
-                tmxMap.ParseMapXml(doc);
+                tmxMap.ParseMapXml(doc, projectPath);
 
                 // We're done reading and parsing the tmx file
                 Console.WriteLine("Map details: {0}", tmxMap.ToString());
@@ -54,8 +69,12 @@ namespace Tiled2Unity
             return doc;
         }
 
-        private void ParseMapXml(XDocument doc)
+        private void ParseMapXml(XDocument doc, string projectPath)
         {
+            _projectPath = projectPath;
+
+            Console.WriteLine("TMX Path = {0}", _projectPath);
+
             Console.WriteLine("Parsing map root ...");
 
             XElement map = doc.Element("map");
@@ -153,7 +172,7 @@ namespace Tiled2Unity
             // Tilesets may have an image for all tiles within it, or it may have an image per tile
             if (elemTileset.Element("image") != null)
             {
-                TmxImage tmxImage = TmxImage.FromXml(elemTileset.Element("image"));
+                TmxImage tmxImage = TmxImage.FromXml(elemTileset.Element("image"),_projectPath);
 
                 // Create all the tiles
                 // This is a bit complicated because of spacing and margin
@@ -177,7 +196,7 @@ namespace Tiled2Unity
                 // Each tile will have it's own image
                 foreach (var t in elemTileset.Elements("tile"))
                 {
-                    TmxImage tmxImage = TmxImage.FromXml(t.Element("image"));
+                    TmxImage tmxImage = TmxImage.FromXml(t.Element("image"),_projectPath);
 
                     uint localId = (uint)tilesToAdd.Count();
 
@@ -244,7 +263,7 @@ namespace Tiled2Unity
                 return;
             }
 
-            TmxImage tmxImage = TmxImage.FromXml(xmlImage);
+            TmxImage tmxImage = TmxImage.FromXml(xmlImage, _projectPath);
 
             // The "firstId" is is always one more than all the tiles that we've already parsed (which may be zero)
             uint firstId = 1;

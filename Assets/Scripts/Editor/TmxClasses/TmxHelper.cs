@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+using UnityEngine;
+using UnityEditor;
 
 
 namespace Tiled2Unity
@@ -191,8 +193,9 @@ namespace Tiled2Unity
 
             //TODO: Create a texture
             //Bitmap bitmapRaw = (Bitmap)Bitmap.FromFile(file);
-
-            return CreateBitmap32bpp(1, 1);
+            Texture texture = (Texture2D)AssetDatabase.LoadAssetAtPath(file, typeof(Texture2D));
+            //return CreateBitmap32bpp(1, 1);
+            return texture;
         }
 
     }
