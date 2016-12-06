@@ -226,7 +226,7 @@ namespace Tiled2Unity
         {
             Vector2 imageLocation = tmxTile.LocationOnSource;
             Vector2 tileSize = new Vector2(tmxTile.TileSize.Width,tmxTile.TileSize.Height);
-            Vector2 imageSize = new Vector2(tmxTile.TmxImage.Size.Width, tmxTile.TmxImage.Size.Width);
+            Vector2 imageSize = new Vector2(tmxTile.TmxImage.Size.Width, tmxTile.TmxImage.Size.Height);
 
             Vector2[] points = new Vector2[4];
             points[0] = imageLocation;
