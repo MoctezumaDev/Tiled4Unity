@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objecttypes>
+ <objecttype name="Floor" color="#ff0000">
+  <property name="collider" type="bool" default="true"/>
+ </objecttype>
+</objecttypes>

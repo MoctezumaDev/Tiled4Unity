@@ -57,6 +57,9 @@ public class TmxImporter : AssetPostprocessor
     {
         TmxMap map = TmxMap.LoadFromFile(asset);
 
+        string objectTypeXmlPath = AssetDatabase.GetAssetPath(Tile4UnitySettings.GetSettings().ObjectTypes);
+        map.LoadObjectTypeXml(objectTypeXmlPath);
+
         if (map.IsLoaded)
         {
             TiledMapExporter exporter = new TiledMapExporter(map);
