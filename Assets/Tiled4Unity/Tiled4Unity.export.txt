@@ -1,0 +1,3 @@
+[Tiled4Unity Version 1.0.7.0]
+Do not modify or delete this file!
+This file is needed by the Tiled4Unity utility in order to determine export directory.
