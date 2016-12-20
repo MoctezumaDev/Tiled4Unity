@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace Tiled4Unity
@@ -106,11 +107,23 @@ namespace Tiled4Unity
             // Save the file (which is importing it into Unity)
             string pathToSave = Path.Combine(exportDir, fileToSave);
             Console.WriteLine("Exporting to: {0}", pathToSave);
+
+            //TODO: not save the xml at all
             doc.Save(pathToSave);
             Console.WriteLine("Succesfully exported: {0}\n  Vertex Scale = {1}\n  Object Type Xml = {2}",
                 pathToSave,
                 Settings.Scale,
                 "<none>");
+
+            using (ImportTiled4Unity t2uImporter = new ImportTiled4Unity(pathToSave))
+            {
+                if (t2uImporter.IsTiled4UnityFile())
+                {
+                    // Start the import process. This will trigger textures and meshes to be imported as well.
+                    t2uImporter.ImportBegin(doc);
+                    AssetDatabase.Refresh();
+                }
+            }
         }
 
         public static Vector2 VectorToUnityVector_NoScale(Vector2 pt)

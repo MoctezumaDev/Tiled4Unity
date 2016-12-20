@@ -81,12 +81,12 @@ namespace Tiled4Unity
 #if !UNITY_WEBPLAYER
                 using (ImportTiled4Unity t2uImporter = new ImportTiled4Unity(imported))
                 {
-                    if (t2uImporter.IsTiled4UnityFile())
+                    /*if (t2uImporter.IsTiled4UnityFile())
                     {
                         // Start the import process. This will trigger textures and meshes to be imported as well.
                         t2uImporter.ImportBegin(imported);
                     }
-                    else if (t2uImporter.IsTiled4UnityTexture())
+                    else*/ if (t2uImporter.IsTiled4UnityTexture())
                     {
                         // A texture was imported and the material assigned to it may need to be fixed
                         t2uImporter.TextureImported(imported);
