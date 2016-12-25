@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+//#define T2U_TRIANGLES
 
 // Given a TmxMap and TmxLayer, crank out a Clipper polytree solution
 namespace Tiled4Unity
@@ -132,14 +133,24 @@ namespace Tiled4Unity
         // Each array of points in a separate convex polygon
         public static IEnumerable<Vector2[]> SolutionPolygons_Simple(ClipperLib.PolyTree solution)
         {
-            ConvexPolygonSet convexPolygonSet = new ConvexPolygonSet();
-            convexPolygonSet.MakeConvextSetFromClipperSolution(solution);
-
-            foreach (var polygon in convexPolygonSet.Polygons)
+            // Triangulate the solution polygon
+            Geometry.TriangulateClipperSolution triangulation = new Geometry.TriangulateClipperSolution();
+            List<Vector2[]> triangles = triangulation.Triangulate(solution);
+#if T2U_TRIANGLES
+            // Force triangle output
+            foreach (var tri in triangles)
             {
-                var pointfs = polygon.Select(pt => new Vector2(pt.Xf, pt.Yf));
-                yield return pointfs.ToArray();
+                yield return tri;
             }
+#else
+            // Group the triangles into convex polygons
+            Geometry.ComposeConvexPolygons composition = new Geometry.ComposeConvexPolygons();
+            List<Vector2[]> polygons = composition.Compose(triangles);
+            foreach (var poly in polygons)
+            {
+                yield return poly;
+            }
+#endif
         }
 
     }

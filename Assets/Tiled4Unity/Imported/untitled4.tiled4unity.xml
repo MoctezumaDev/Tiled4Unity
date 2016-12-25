@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <!--Tiled4Unity generated xml data-->
 <!--Do not modify by hand-->
-<!--Last exported: 12/21/2016 8:24:13 AM-->
+<!--Last exported: 12/25/2016 10:02:42 AM-->
 <Tiled4Unity version="0.0.1">
   <AssignMaterial mesh="mesh_0001" material="colors" />
   <Prefab name="untitled4" orientation="Orthogonal" staggerAxis="y" staggerIndex="Odd" hexSideLength="0" numLayers="1" numTilesWide="40" numTilesHigh="40" tileWidth="32" tileHeight="32" exportScale="1" mapWidthInPixels="1280" mapHeightInPixels="1280">
