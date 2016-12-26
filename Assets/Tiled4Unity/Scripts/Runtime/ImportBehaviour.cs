@@ -6,8 +6,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-
-using UnityEditor;
 #endif
 
 using UnityEngine;
@@ -21,12 +19,10 @@ namespace Tiled4Unity
     {
         public string ImportName;
 
-        // This isn't supposed to exist outside the editor
-#if UNITY_EDITOR
         public XDocument XmlDocument { get; private set; }
 
-        private int importCounter = 0;
-        private int numberOfElements = 0;
+        public int ImportCounter = 0;
+        public int NumberOfElements = 0;
 
         public static string GetFilenameWithoutTiled4UnityExtension(string filename)
         {
@@ -41,9 +37,19 @@ namespace Tiled4Unity
             return Path.GetFileName(filename);
         }
 
+        public float Progress
+        {
+            get
+            {
+                if (NumberOfElements == 0) return 1.0f;
+                return this.ImportCounter / (float)this.NumberOfElements;
+            }
+        }
+        
+
         // We have many independent requests on the ImportBehaviour so we can't take for granted it has been created yet.
         // However, if it has been created then use it.
-        public static ImportBehaviour FindOrCreateImportBehaviour(string xmlPath)
+        public static ImportBehaviour FindOrCreateImportBehaviour(string xmlPath, Action<string, string, float> onProgress)
         {
             string importName = ImportBehaviour.GetFilenameWithoutTiled4UnityExtension(xmlPath);
 
@@ -62,40 +68,19 @@ namespace Tiled4Unity
             gameObject.transform.SetAsFirstSibling();
 #endif
 
-            var importStatus = gameObject.AddComponent<ImportBehaviour>();
+            ImportBehaviour importStatus = gameObject.AddComponent<ImportBehaviour>();
             importStatus.ImportName = importName;
 
             // Opening the XDocument itself can be expensive so start the progress bar just before we start
-            importStatus.StartProgressBar(xmlPath);
+            //importStatus.StartProgressBar(xmlPath);
             importStatus.XmlDocument = XDocument.Load(xmlPath);
 
-            importStatus.numberOfElements = importStatus.XmlDocument.Element("Tiled4Unity").Elements().Count();
-            importStatus.IncrementProgressBar(xmlPath);
+            importStatus.NumberOfElements = importStatus.XmlDocument.Element("Tiled4Unity").Elements().Count();
+            onProgress(xmlPath, importName, importStatus.Progress);
+            importStatus.ImportCounter++;
 
             return importStatus;
         }
-
-        private void StartProgressBar(string xmlPath)
-        {
-            string title = string.Format("Tiled4Unity Import ({0})", this.ImportName);
-            UnityEditor.EditorUtility.DisplayProgressBar(title, xmlPath, 0);
-        }
-
-        public void IncrementProgressBar(string detail)
-        {
-            string title = string.Format("Tiled4Unity Import ({0})", this.ImportName);
-
-            float progress = this.importCounter / (float)this.numberOfElements;
-            UnityEditor.EditorUtility.DisplayProgressBar(title, detail, progress);
-            this.importCounter++;
-        }
-
-        public void DestroyImportBehaviour()
-        {
-            UnityEditor.EditorUtility.ClearProgressBar();
-            UnityEngine.Object.DestroyImmediate(this.gameObject);
-        }
-#endif
 
         // In case this behaviour leaks out of an import and into the runtime, complain.
         private void Update()

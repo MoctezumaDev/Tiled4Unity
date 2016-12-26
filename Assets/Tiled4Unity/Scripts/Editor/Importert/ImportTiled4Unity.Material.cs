@@ -23,16 +23,17 @@ namespace Tiled4Unity
         public Material FixMaterialForMeshRenderer(string objName, Renderer renderer)
         {
             string xmlPath = GetXmlImportAssetPath(objName);
-            ImportBehaviour importBehavior = ImportBehaviour.FindOrCreateImportBehaviour(xmlPath);
+            ImportBehaviour importBehaviour = ImportBehaviour.FindOrCreateImportBehaviour(xmlPath,ImportProgressBar.DisplayProgressBar);
 
             // The mesh to match
             string meshName = renderer.name;
 
             // Increment our progress bar
-            importBehavior.IncrementProgressBar(String.Format("Assign material: {0}", meshName));
+            ImportProgressBar.DisplayProgressBar(String.Format("Assign material: {0}", meshName), importBehaviour.ImportName, importBehaviour.Progress);
+            importBehaviour.ImportCounter++;
 
             // Find an assignment that matches the mesh renderer
-            var assignMaterials = importBehavior.XmlDocument.Root.Elements("AssignMaterial");
+            var assignMaterials = importBehaviour.XmlDocument.Root.Elements("AssignMaterial");
             XElement match = assignMaterials.FirstOrDefault(el => el.Attribute("mesh").Value == meshName);
 
             if (match == null)

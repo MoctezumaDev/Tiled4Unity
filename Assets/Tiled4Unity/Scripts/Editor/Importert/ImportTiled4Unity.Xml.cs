@@ -68,8 +68,9 @@ namespace Tiled4Unity
 
             // Get at the import behavour tied to this prefab and remove it from the scene
             string xmlAssetPath = GetXmlImportAssetPath(prefabName);
-            ImportBehaviour importBehaviour = ImportBehaviour.FindOrCreateImportBehaviour(xmlAssetPath);
-            importBehaviour.DestroyImportBehaviour();
+            ImportBehaviour importBehaviour = ImportBehaviour.FindOrCreateImportBehaviour(xmlAssetPath,ImportProgressBar.DisplayProgressBar);
+            ImportProgressBar.HideProgressBar();
+            GameObject.DestroyImmediate(importBehaviour.gameObject);
         }
 
         private void CheckVersion(string xmlPath, XDocument xml)
