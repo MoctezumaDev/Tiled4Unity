@@ -23,7 +23,7 @@ namespace Tiled4Unity
         public Material FixMaterialForMeshRenderer(string objName, Renderer renderer)
         {
             string xmlPath = GetXmlImportAssetPath(objName);
-            ImportBehaviour importBehaviour = ImportBehaviour.FindOrCreateImportBehaviour(xmlPath,ImportProgressBar.DisplayProgressBar);
+            ImportXMLHelper importBehaviour = ImportXMLHelper.ImportPath(xmlPath);
 
             // The mesh to match
             string meshName = renderer.name;

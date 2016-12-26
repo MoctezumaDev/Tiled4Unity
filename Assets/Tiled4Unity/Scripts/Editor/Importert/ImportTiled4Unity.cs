@@ -90,9 +90,7 @@ namespace Tiled4Unity
 
         public string GetXmlImportAssetPath(string name)
         {
-#if !UNITY_WEBPLAYER
-            name = ImportBehaviour.GetFilenameWithoutTiled4UnityExtension(name);
-#endif
+            name = ImportXMLHelper.GetFilenameWithoutTiled4UnityExtension(name);
             string xmlAsset = String.Format("{0}/Imported/{1}.tiled4unity.xml", this.assetPathToTiled4UnityRoot, name);
             return xmlAsset;
         }

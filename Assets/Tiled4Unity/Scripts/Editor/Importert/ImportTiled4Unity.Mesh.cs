@@ -31,7 +31,7 @@ namespace Tiled4Unity
             // Get the XML file that this mesh came from
             string xmlPath = GetXmlImportAssetPath(objName);
 
-            ImportBehaviour importBehaviour = ImportBehaviour.FindOrCreateImportBehaviour(xmlPath, ImportProgressBar.DisplayProgressBar);
+            ImportXMLHelper importBehaviour = ImportXMLHelper.ImportPath(xmlPath);
 
             string log = String.Format("Create prefab: {0}",
                 Path.GetFileNameWithoutExtension(GetPrefabAssetPath(objName, false, null)));
