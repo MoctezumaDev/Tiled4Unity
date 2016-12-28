@@ -1,5 +1,5 @@
 h1 {
-	font-family: monaco, Consolas, "Lucida Console", monospace;
+	font-family: 'Share Tech Mono', monospace;
 	font-size: 24px;
 	font-style: normal;
 	font-variant: normal;
@@ -7,7 +7,7 @@ h1 {
 	line-height: 26.4px;
 }
 h3 {
-	font-family: monaco, Consolas, "Lucida Console", monospace;
+	font-family: 'Share Tech Mono', monospace;
 	font-size: 14px;
 	font-style: normal;
 	font-variant: normal;
@@ -15,7 +15,7 @@ h3 {
 	line-height: 15.4px;
 }
 p {
-	font-family: monaco, Consolas, "Lucida Console", monospace;
+	font-family: 'Share Tech Mono', monospace;
 	font-size: 14px;
 	font-style: normal;
 	font-variant: normal;
@@ -23,7 +23,7 @@ p {
 	line-height: 20px;
 }
 blockquote {
-	font-family: monaco, Consolas, "Lucida Console", monospace;
+	font-family: 'Share Tech Mono', monospace;
 	font-size: 21px;
 	font-style: normal;
 	font-variant: normal;
@@ -31,7 +31,7 @@ blockquote {
 	line-height: 30px;
 }
 pre {
-	font-family: monaco, Consolas, "Lucida Console", monospace;
+	font-family: 'Share Tech Mono', monospace;
 	font-size: 13px;
 	font-style: normal;
 	font-variant: normal;
