@@ -242,10 +242,10 @@ namespace Tiled4Unity
             //TmxMath.TransformPoints(points, center, flipDiagonal, flipHorizontal, flipVertical);
 
             Vector2[] coordinates = new Vector2[4];
-            coordinates[3] = PointToTextureCoordinate(points[0], tmxTile.TmxImage.Size);
-            coordinates[2] = PointToTextureCoordinate(points[1], tmxTile.TmxImage.Size);
-            coordinates[1] = PointToTextureCoordinate(points[2], tmxTile.TmxImage.Size);
-            coordinates[0] = PointToTextureCoordinate(points[3], tmxTile.TmxImage.Size);
+            coordinates[3] = PointToTextureCoordinate(points[0], imageSize);
+            coordinates[2] = PointToTextureCoordinate(points[1], imageSize);
+            coordinates[1] = PointToTextureCoordinate(points[2], imageSize);
+            coordinates[0] = PointToTextureCoordinate(points[3], imageSize);
 
             // Apply a small bias to the "inner" edges of the texels
             // This keeps us from seeing seams

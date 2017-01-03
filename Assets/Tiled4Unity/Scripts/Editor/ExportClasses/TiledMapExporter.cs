@@ -163,10 +163,10 @@ namespace Tiled4Unity
             return new Vector2(scaled.x == 0 ? 0 : -scaled.x, scaled.y == 0 ? 0 : -scaled.y);
         }
 
-        public static Vector2 PointToTextureCoordinate(Vector2 pt, Size imageSize)
+        public static Vector2 PointToTextureCoordinate(Vector2 pt, Vector2 imageSize)
         {
-            float tx = pt.x / (float)imageSize.Width;
-            float ty = pt.y / (float)imageSize.Height;
+            float tx = pt.x / imageSize.x;
+            float ty = pt.y / imageSize.y;
             return new Vector2(tx, 1.0f - ty);
         }
 
