@@ -54,3 +54,95 @@ pre {
 	font-weight: 400;
 	line-height: 18.5714px;
 }
+
+/* unvisited link */
+a:link {
+    color: hotpink;
+}
+
+/* visited link */
+a:visited {
+    color: hotpink;
+}
+
+/* mouse over link */
+a:hover {
+    color: 	#FF1493;
+}
+
+h1.topDiv {
+	font-family: 'Share Tech Mono', monospace;
+	font-size: 30px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 500;
+	line-height: 26.4px;
+	color: #FFFFFF
+}
+
+/* selected link */
+a:active {
+    color: 	#FF1493;
+}
+
+body, html { 
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+	
+	background-color: #5E42A6;
+}
+
+/* buttons */
+
+.button {
+    background-color: rgba(0, 0, 0, 0.0); /* Green */
+    border: none;
+    color: #CEB6AA;
+    padding: 5px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+	font-family: 'Share Tech Mono', monospace;
+    margin: 2px 2px;
+    cursor: pointer;
+}
+
+.buttonTop {
+	border-radius: 10px;
+	border: 2px solid #CEB6AA;
+	color: #FFFFFF
+}
+
+/* divs */
+
+#topDiv {
+	background-color: #341E5E;
+	width: 100%;
+	height: 20%;
+	padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+}
+
+#navDiv {
+	background-color: #341E5E;
+	padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+	text-align: center;
+}
+
+#targetDiv {
+	width: 80%;
+	padding-top: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+	margin: 0 auto; 
+	color:#CEB6AA;
+}
