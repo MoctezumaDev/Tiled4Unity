@@ -188,12 +188,20 @@ namespace Tiled4Unity
             return texture;
         }
 
+        public static string NormalizePath(string path)
+        {
+            string absolutepath = Path.GetFullPath(path);
+            path = "Assets" + absolutepath.Substring(Application.dataPath.Length);
+            return path;
+        }
+
         public static Texture FromFileBitmap32bpp(string file)
         {
-
+            string path = NormalizePath(file);
             //TODO: Create a texture
             //Bitmap bitmapRaw = (Bitmap)Bitmap.FromFile(file);
-            Texture texture = (Texture2D)AssetDatabase.LoadAssetAtPath(file, typeof(Texture2D));
+            UnityEngine.Object asset = AssetDatabase.LoadMainAssetAtPath(path);
+            Texture texture = asset as Texture2D;
             //return CreateBitmap32bpp(1, 1);
             return texture;
         }

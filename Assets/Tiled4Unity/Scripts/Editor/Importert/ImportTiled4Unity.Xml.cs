@@ -159,9 +159,9 @@ namespace Tiled4Unity
             {
                 shaderName += " Color Key";
 
-                byte r = byte.Parse(htmlColor.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
-                byte g = byte.Parse(htmlColor.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
-                byte b = byte.Parse(htmlColor.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+                byte r = byte.Parse(htmlColor.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+                byte g = byte.Parse(htmlColor.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+                byte b = byte.Parse(htmlColor.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
                 keyColor = new Color32(r, g, b, 255);
             }
 

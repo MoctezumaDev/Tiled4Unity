@@ -50,11 +50,16 @@ namespace Tiled4Unity
 
         private XDocument LoadDocument(string xmlPath)
         {
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.XmlResolver = null;
+            settings.ProhibitDtd = false;
+
             XDocument doc = null;
             Console.WriteLine("Opening {0} ...", xmlPath);
             try
             {
-                doc = XDocument.Load(xmlPath);
+                XmlReader reader = XmlTextReader.Create(xmlPath, settings);
+                doc = XDocument.Load(reader);
             }
             catch (FileNotFoundException fnf)
             {
