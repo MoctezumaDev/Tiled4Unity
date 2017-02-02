@@ -148,15 +148,18 @@ namespace Tiled4Unity
 
                 // No shadows
                 mr.receiveShadows = false;
-#if T2U_USE_LEGACY_IMPORTER
-                mr.castShadows = false;
-#else
+#if UNITY_5_3_OR_NEWER
                 mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+#else
+                mr.castShadows = false;
 #endif
 
                 // No probes
+#if UNITY_5_5_OR_NEWER
+                mr.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
+#elif UNITY_5_3_OR_NEWER
                 mr.useLightProbes = false;
-#if !T2U_USE_LEGACY_IMPORTER
+#else
                 mr.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
 #endif
             }
@@ -205,19 +208,32 @@ namespace Tiled4Unity
             this.assetImporter.userData = "tiled4unity";
 
             TextureImporter textureImporter = this.assetImporter as TextureImporter;
-            textureImporter.textureType = TextureImporterType.Default;
+            textureImporter.textureType = TextureImporterType.Sprite;
             textureImporter.npotScale = TextureImporterNPOTScale.None;
             textureImporter.convertToNormalmap = false;
-            textureImporter.lightmap = false;
+            
             textureImporter.alphaIsTransparency = true;
-            textureImporter.grayscaleToAlpha = false;
-            textureImporter.linearTexture = false;
             textureImporter.spriteImportMode = SpriteImportMode.None;
             textureImporter.mipmapEnabled = false;
-            textureImporter.generateCubemap = TextureImporterGenerateCubemap.None;
             textureImporter.filterMode = FilterMode.Point;
             textureImporter.wrapMode = TextureWrapMode.Clamp;
+
+#if UNITY_5_5_OR_NEWER
+            textureImporter.alphaSource = TextureImporterAlphaSource.None;
+            textureImporter.sRGBTexture = false;
+            textureImporter.textureCompression = TextureImporterCompression.Uncompressed;
+#else
+            textureImporter.lightmap = false;
+            textureImporter.grayscaleToAlpha = false;
+            textureImporter.linearTexture = false;
+            textureImporter.generateCubemap = TextureImporterGenerateCubemap.None;
             textureImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
+#endif
+
+
+
+
+
         }
 
     }

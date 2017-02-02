@@ -30,22 +30,18 @@ namespace Tiled4Unity
             string fullTmxPath = Path.GetFullPath(tmxPath);
             string projectPath = GetProjectPath(tmxPath);
 
-            //using (ChDir chdir = new ChDir(fullTmxPath))
-            {
-                TmxMap tmxMap = new TmxMap();
-                XDocument doc = tmxMap.LoadDocument(fullTmxPath);
+            TmxMap tmxMap = new TmxMap();
+            XDocument doc = tmxMap.LoadDocument(fullTmxPath);
 
-                tmxMap.Name = Path.GetFileNameWithoutExtension(fullTmxPath);
-                tmxMap.ParseMapXml(doc, projectPath);
+            tmxMap.Name = Path.GetFileNameWithoutExtension(fullTmxPath);
+            tmxMap.ParseMapXml(doc, projectPath);
 
-                // We're done reading and parsing the tmx file
-                Console.WriteLine("Map details: {0}", tmxMap.ToString());
-                Console.WriteLine("Parsed: {0} ", fullTmxPath);
+            // We're done reading and parsing the tmx file
+            Console.WriteLine("Map details: {0}", tmxMap.ToString());
+            Console.WriteLine("Parsed: {0} ", fullTmxPath);
 
-                tmxMap.IsLoaded = true;
-                return tmxMap;
-            }
-            return null;
+            tmxMap.IsLoaded = true;
+            return tmxMap;
         }
 
         private XDocument LoadDocument(string xmlPath)
