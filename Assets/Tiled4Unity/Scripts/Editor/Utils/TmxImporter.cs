@@ -35,19 +35,7 @@ public class TmxImporter : AssetPostprocessor
             // This is our detection of file - by extension
             if (HasExtension(asset))
             {
-                TextReader stream = new StreamReader(asset);
-                string firstLine = stream.ReadLine();
-                stream.Close();
-
-                // Also we check first file line
-                //if (firstLine.Equals("MagicLine", StringComparison.OrdinalIgnoreCase))
-                {
-                    ImportMyAsset(asset);
-                }
-                /*else
-                {
-                    Debug.LogError("Cannot import \"" + asset + "\": bad format!");
-                }*/
+                ImportMyAsset(asset);
             }
         }
     }

@@ -245,12 +245,9 @@ namespace Tiled4Unity
 
         private void ParseExternalTileset(string tsxPath, uint firstId)
         {
-            string fullTsxPath = Path.GetFullPath(tsxPath);
-            /*using (ChDir chdir = new ChDir(fullTsxPath))
-            {
-                XDocument tsx = LoadDocument(fullTsxPath);
-                ParseInternalTileset(tsx.Root, firstId);
-            }*/
+            string fullTsxPath = Path.GetFullPath(_projectPath + tsxPath);
+            XDocument tsx = LoadDocument(fullTsxPath);
+            ParseInternalTileset(tsx.Root, firstId);
         }
 
         private void ParseTilesetFromImageLayer(XElement elemImageLayer)

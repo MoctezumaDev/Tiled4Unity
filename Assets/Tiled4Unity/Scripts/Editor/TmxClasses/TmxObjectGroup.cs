@@ -27,8 +27,6 @@ namespace Tiled4Unity
                 Rect objBounds = obj.GetWorldBounds();
                 objBounds.position += translation;
 
-                float maxX = Mathf.Max(bounds.max.x,objBounds.max.x);
-
                 float xMin = Mathf.Min(bounds.xMin, objBounds.xMin);
                 float xMax = Mathf.Max(bounds.xMax, objBounds.xMax);
                 float yMin = Mathf.Min(bounds.yMin, objBounds.yMin);

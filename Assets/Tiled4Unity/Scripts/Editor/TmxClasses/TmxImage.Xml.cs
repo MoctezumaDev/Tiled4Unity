@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace Tiled4Unity
@@ -32,11 +28,9 @@ namespace Tiled4Unity
             tmxImage.TransparentColor = TmxHelper.GetAttributeAsString(elemImage, "trans", "");
             if (!String.IsNullOrEmpty(tmxImage.TransparentColor))
             {
-#if !TILED_2_UNITY_LITE
-                Color transColor = TmxHelper.ColorFromHtml(tmxImage.TransparentColor);
-                //TODO: Transparent color?
-                //tmxImage.ImageBitmap.MakeTransparent(transColor);
-#endif
+                //TODO: Transparent color? this would require a material
+                //Color transColor = TmxHelper.ColorFromHtml(tmxImage.TransparentColor);
+                //tmxImage.ImageBitmap.(transColor);
             }
 
             return tmxImage;
