@@ -46,18 +46,7 @@ namespace Tiled4Unity
                 }
             }
 
-            if (useThisImporter == true)
-            {
-#if UNITY_WEBPLAYER
-                String warning = String.Format("Can not import through Tiled4Unity using the WebPlayer platform. This is depecrated by Unity Technologies and is no longer supported. Go to File -> Build Settings... and switch to another platform. (You can switch back to Web Player after importing.). File: {0}", assetPath);
-                Debug.LogWarning(warning);
-                return false;
-#else
-                return true;
-#endif
-            }
-
-            return false;
+            return useThisImporter;
         }
 
         private bool UseThisImporter()
@@ -78,15 +67,9 @@ namespace Tiled4Unity
                     continue;
                 }
 
-#if !UNITY_WEBPLAYER
                 using (ImportTiled4Unity t2uImporter = new ImportTiled4Unity(imported))
                 {
-                    /*if (t2uImporter.IsTiled4UnityFile())
-                    {
-                        // Start the import process. This will trigger textures and meshes to be imported as well.
-                        t2uImporter.ImportBegin(imported);
-                    }
-                    else*/ if (t2uImporter.IsTiled4UnityTexture())
+                    if (t2uImporter.IsTiled4UnityTexture())
                     {
                         // A texture was imported and the material assigned to it may need to be fixed
                         t2uImporter.TextureImported(imported);
@@ -103,7 +86,6 @@ namespace Tiled4Unity
                         Debug.Log(string.Format("Imported prefab from Tiled map editor: {0}", imported));
                     }
                 }
-#endif
             }
         }
 
@@ -184,12 +166,8 @@ namespace Tiled4Unity
                 rootName = rootName.Remove(rootIndex);
             }
 
-#if !UNITY_WEBPLAYER
             ImportTiled4Unity importer = new ImportTiled4Unity(this.assetPath);
             return importer.FixMaterialForMeshRenderer(rootName, renderer);
-#else
-            return null;
-#endif
         }
 
         private void OnPreprocessTexture()
@@ -229,10 +207,6 @@ namespace Tiled4Unity
             textureImporter.generateCubemap = TextureImporterGenerateCubemap.None;
             textureImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
 #endif
-
-
-
-
 
         }
 

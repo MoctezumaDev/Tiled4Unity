@@ -1,3 +1,4 @@
+[System.Serializable]
 public struct Size
 {
     public int Width;
@@ -10,6 +11,7 @@ public struct Size
     }
 }
 
+[System.Serializable]
 public struct SizeF
 {
     public float Width;

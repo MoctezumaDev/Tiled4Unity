@@ -261,7 +261,8 @@ namespace Tiled4Unity
                 return;
             }
 
-            TmxImage tmxImage = TmxImage.FromXml(xmlImage, _projectPath);
+            TmxImage tmxImage = TmxImage.
+                FromXml(xmlImage, _projectPath);
 
             // The "firstId" is is always one more than all the tiles that we've already parsed (which may be zero)
             uint firstId = 1;

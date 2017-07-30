@@ -13,12 +13,12 @@ namespace Tiled4Unity
     {
         private TmxMap tmxMap = null;
 
-        public TiledMapExporter(TmxMap tmxMap)
+        public TiledMapExporter (TmxMap tmxMap)
         {
             this.tmxMap = tmxMap;
         }
 
-        public void Export(string exportToTiled4UnityPath)
+        public void Export(string exportToTiled4UnityPath, TmxImportSettings settings)
         {
             if (String.IsNullOrEmpty(exportToTiled4UnityPath))
             {
@@ -30,10 +30,16 @@ namespace Tiled4Unity
             string fileToSave = this.tmxMap.GetExportedFilename();
             Console.WriteLine("Compiling tiled4unity file: "+ fileToSave);
 
-            // Need an element for embedded file data that will be imported into Unity
-            // These are models and textures
-            List<XElement> importFiles = CreateImportFilesElements(exportToTiled4UnityPath);
-            List<XElement> assignMaterials = CreateAssignMaterialsElements();
+            TmxObj mesh = CreateMesh();
+            List<TmxImage> images = CreateImagesList();
+            List<MeshMaterial> meshMaterials = CreateMeshMaterialsList();
+
+            settings.mesh = mesh;
+            settings.images = images.ToArray();
+            settings.meshMaterials = meshMaterials.ToArray();
+
+            EditorUtility.SetDirty(settings);
+            AssetDatabase.SaveAssets();
 
             Console.WriteLine("Gathering prefab data ...");
             XElement prefab = CreatePrefabElement();
@@ -42,9 +48,7 @@ namespace Tiled4Unity
             Console.WriteLine("Writing as Xml ...");
 
             XElement root = new XElement("Tiled4Unity", new XAttribute("version", Settings.Version));
-            root.Add(assignMaterials);
             root.Add(prefab);
-            root.Add(importFiles);
 
             // Create the XDocument to save
             XDocument doc = new XDocument(
@@ -67,62 +71,14 @@ namespace Tiled4Unity
                 return;
             }
 
-            // Detect which version of Tiled4Unity is in our project
-            // ...\Tiled4Unity\Tiled4Unity.export.txt
-            //TODO: update version checking @Leon
-            string unityProjectVersionTXT = Path.Combine(exportToTiled4UnityPath, "Tiled4Unity.export.txt");
-            if (!File.Exists(unityProjectVersionTXT))
-            {
-                StringBuilder builder = new StringBuilder();
-                builder.AppendFormat("Could not export '{0}'\n", fileToSave);
-                builder.AppendFormat("Tiled4Unity.unitypackage is not properly installed in unity project: {0}\n", exportToTiled4UnityPath);
-                builder.AppendFormat("Missing file: {0}\n", unityProjectVersionTXT);
-                builder.AppendFormat("Select \"Help -> Import Unity Package to Project\" and re-export");
-                Console.WriteLine(builder.ToString()); //Error
-                return;
-            }
-
-            // Open the unity-side script file and check its version number
-            string text = File.ReadAllText(unityProjectVersionTXT);
-            if (!String.IsNullOrEmpty(text))
-            {
-                string pattern = @"^\[Tiled4Unity Version (?<version>.*)?\]";
-                Regex regex = new Regex(pattern);
-                Match match = regex.Match(text);
-                Group group = match.Groups["version"];
-                if (group.Success)
-                {
-                    if (Settings.Version != group.ToString())
-                    {
-                        StringBuilder builder = new StringBuilder();
-                        builder.AppendFormat("Export/Import Version mismatch\n");
-                        builder.AppendFormat("  Tiled4Unity version   : {0}\n", Settings.Version);
-                        builder.AppendFormat("  Unity Project version : {0}\n", group.ToString());
-                        builder.AppendFormat("  (Did you forget to update Tiled4Unity scipts in your Unity project?)");
-                        Console.WriteLine(builder.ToString());
-                    }
-                }
-            }
-
             // Save the file (which is importing it into Unity)
             string pathToSave = Path.Combine(exportDir, fileToSave);
-            Console.WriteLine("Exporting to: {0}", pathToSave);
+            // Console.WriteLine("Exporting to: {0}", pathToSave);
 
-            //TODO: not save the xml at all
-            doc.Save(pathToSave);
-            Console.WriteLine("Succesfully exported: {0}\n  Vertex Scale = {1}\n  Object Type Xml = {2}",
-                pathToSave,
-                Settings.Scale,
-                "<none>");
-
-            using (ImportTiled4Unity t2uImporter = new ImportTiled4Unity(pathToSave))
+            using (ImportTiled4Unity t4uImporter = new ImportTiled4Unity(pathToSave))
             {
-                if (t2uImporter.IsTiled4UnityFile())
-                {
-                    // Start the import process. This will trigger textures and meshes to be imported as well.
-                    t2uImporter.ImportBegin(doc);
-                    AssetDatabase.Refresh();
-                }
+                t4uImporter.ImportBegin(mesh, images, meshMaterials);
+                AssetDatabase.Refresh();
             }
         }
 
@@ -180,21 +136,6 @@ namespace Tiled4Unity
         {
             return Convert.ToBase64String(File.ReadAllBytes(path));
         }
-
-        //private string FileToCompressedBase64String(string path)
-        //{
-        //    using (FileStream originalStream = File.OpenRead(path))
-        //    using (MemoryStream byteStream = new MemoryStream())
-        //    using (GZipStream gzipStream = new GZipStream(byteStream, CompressionMode.Compress))
-        //    {
-        //        originalStream.CopyTo(gzipStream);
-        //        byte[] compressedBytes = byteStream.ToArray();
-        //        return Convert.ToBase64String(compressedBytes);
-        //    }
-        //
-        //    // Without compression (testing shows it ~300% larger)
-        //    //return Convert.ToBase64String(File.ReadAllBytes(path));
-        //}
 
     } // end class
 } // end namepsace

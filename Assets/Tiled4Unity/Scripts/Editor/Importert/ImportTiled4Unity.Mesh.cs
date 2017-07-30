@@ -28,8 +28,9 @@ namespace Tiled4Unity
             // String the mesh type (.obj) from the path
             string objName = Path.GetFileNameWithoutExtension(objPath);
 
+            // TODO: Create prefab
             // Get the XML file that this mesh came from
-            string xmlPath = GetXmlImportAssetPath(objName);
+            /*string xmlPath = GetXmlImportAssetPath(objName);
 
             ImportXMLHelper importBehaviour = ImportXMLHelper.ImportPath(xmlPath);
 
@@ -41,7 +42,7 @@ namespace Tiled4Unity
             foreach (var xmlPrefab in importBehaviour.XmlDocument.Root.Elements("Prefab"))
             {
                 CreatePrefab(xmlPrefab, objPath);
-            }
+            }*/
         }
 
         private void CreatePrefab(XElement xmlPrefab, string objPath)

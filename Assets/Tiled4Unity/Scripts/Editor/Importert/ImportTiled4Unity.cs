@@ -40,11 +40,6 @@ namespace Tiled4Unity
             this.assetPathToTiled4UnityRoot = "Assets" + this.assetPathToTiled4UnityRoot;
         }
 
-        public bool IsTiled4UnityFile()
-        {
-            return this.fullPathToFile.EndsWith(".tiled4unity.xml");
-        }
-
         public bool IsTiled4UnityTexture()
         {
             bool startsWith = this.fullPathToFile.Contains("/Tiled4Unity/Textures/");

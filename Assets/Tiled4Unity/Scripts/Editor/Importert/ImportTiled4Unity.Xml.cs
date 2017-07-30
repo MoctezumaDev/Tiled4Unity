@@ -18,46 +18,14 @@ namespace Tiled4Unity
     // Concentrates on the Xml file being imported
     partial class ImportTiled4Unity
     {
-        //TODO: reset version for Tiled4Unity
-        public static readonly string ThisVersion = "1.0.7.0";
-
         // Called when Unity detects the *.tiled4unity.xml file needs to be (re)imported
-        public void ImportBegin(string xmlPath)
+        public void ImportBegin(TmxObj mesh, List<TmxImage> images, List<MeshMaterial> materials)
         {
-            // Normally, this is where we first create the XmlDocument for the whole import.
-            /*ImportBehaviour importBehaviour = ImportBehaviour.FindOrCreateImportBehaviour(xmlPath);
-            XDocument xml = importBehaviour.XmlDocument;
-            if (xml == null)
-            {
-                Debug.LogError(String.Format("GameObject {0} not successfully initialized. Is it left over from a previous import. Try removing from scene are re-importing {1}.", importBehaviour.gameObject.name, xmlPath));
-                return;
-            }
-
-            CheckVersion(xmlPath, xml);
-
             // Import asset files.
             // (Note that textures should be imported before meshes)
-            ImportTexturesFromXml(xml);
-            CreateMaterialsFromInternalTextures(xml);
-            ImportMeshesFromXml(xml);*/
-        }
-
-        // Called when Unity detects the *.tiled4unity.xml file needs to be (re)imported
-        public void ImportBegin(XDocument xml)
-        {
-            if (xml == null)
-            {
-                //Debug.LogError(String.Format("GameObject {0} not successfully initialized. Is it left over from a previous import. Try removing from scene are re-importing {1}.", importBehaviour.gameObject.name, xmlPath));
-                return;
-            }
-
-            //CheckVersion(xmlPath, xml);
-
-            // Import asset files.
-            // (Note that textures should be imported before meshes)
-            ImportTexturesFromXml(xml);
-            CreateMaterialsFromInternalTextures(xml);
-            ImportMeshesFromXml(xml);
+            // ImportTexturesFromXml(xml); //TODO: recover internal textures
+            CreateMaterialsFromInternalTextures(images);
+            CreateMesh(mesh);
         }
 
         // Called when the import process has completed and we have a prefab ready to go
@@ -73,16 +41,8 @@ namespace Tiled4Unity
             ImportXMLHelper.RemovePath(importBehaviour.ImportName);
         }
 
-        private void CheckVersion(string xmlPath, XDocument xml)
-        {
-            string version = xml.Root.Attribute("version").Value;
-            if (version != ThisVersion)
-            {
-                Debug.LogWarning(string.Format("Imported Tiled4Unity file '{0}' was exported with version {1}. We are expecting version {2}", xmlPath, version, ThisVersion));
-            }
-        }
-
-        private void ImportTexturesFromXml(XDocument xml)
+        //Todo recover internal texture
+        /*private void ImportTexturesFromXml(XDocument xml)
         {
             var texData = xml.Root.Elements("ImportTexture");
             foreach (var tex in texData)
@@ -111,35 +71,46 @@ namespace Tiled4Unity
                     ImportUtils.CreateOrReplaceAsset(material, materialPath);
                 }
             }
-        }
+        }*/
 
-        private void CreateMaterialsFromInternalTextures(XDocument xml)
+        private void CreateMaterialsFromInternalTextures(List<TmxImage> images)
         {
-            var texData = xml.Root.Elements("InternalTexture");
-            foreach (var tex in texData)
+            foreach (var image in images)
             {
-                string texAssetPath = tex.Attribute("assetPath").Value;
-                string materialPath = GetMaterialAssetPath(texAssetPath);
+                bool isInternal = File.Exists(Path.ChangeExtension(image.AbsolutePath, "meta"));
+                if (isInternal)
+                {
+                    //TODO: recover internal textures
+                }
+                else
+                {
+                    // The path to the texture will be WRT to the Unity project root
+                    string imageAssetPath = image.AbsolutePath;
+                    imageAssetPath = imageAssetPath.TrimStart('\\');
+                    imageAssetPath = imageAssetPath.TrimStart('/');
 
-                // Create our material
-                Material material = CreateMaterialFromXml(tex);
+                    string materialPath = GetMaterialAssetPath(imageAssetPath);
 
-                // Assign to it the texture that is already internal to our Unity project
-                Texture2D texture2d = AssetDatabase.LoadAssetAtPath(texAssetPath, typeof(Texture2D)) as Texture2D;
-                material.SetTexture("_MainTex", texture2d);
+                    // Transparent color key?
+                    string transparentColor = image.TransparentColor;
+                    bool depthBufferEnabled = Settings.DepthBufferEnabled;
 
-                // Write the material to our asset database
-                ImportUtils.ReadyToWrite(materialPath);
-                ImportUtils.CreateOrReplaceAsset(material, materialPath);
+                    // Create our material
+                    Material material = CreateMaterial(transparentColor, depthBufferEnabled);
+
+                    // Assign to it the texture that is already internal to our Unity project
+                    Texture2D texture2d = AssetDatabase.LoadAssetAtPath(imageAssetPath, typeof(Texture2D)) as Texture2D;
+                    material.SetTexture("_MainTex", texture2d);
+
+                    // Write the material to our asset database
+                    ImportUtils.ReadyToWrite(materialPath);
+                    ImportUtils.CreateOrReplaceAsset(material, materialPath);
+                }
             }
         }
 
-        private Material CreateMaterialFromXml(XElement xml)
+        private Material CreateMaterial(string htmlColor, bool usesDepthShader)
         {
-            // Does this material support alpha color key?
-            string htmlColor = ImportUtils.GetAttributeAsString(xml, "alphaColorKey", "");
-            bool usesDepthShader = ImportUtils.GetAttributeAsBoolean(xml, "usesDepthShaders", false);
-
             // Determine which shader we sould be using
             string shaderName = "Tiled4Unity/";
 
@@ -175,26 +146,20 @@ namespace Tiled4Unity
             return material;
         }
 
-        private void ImportMeshesFromXml(XDocument xml)
+        private void CreateMesh(TmxObj mesh)
         {
-            var meshData = xml.Root.Elements("ImportMesh");
-            foreach (var mesh in meshData)
-            {
-                // We're going to create/write a file that contains our mesh data as a Wavefront Obj file
-                // The actual mesh will be imported from this Obj file
+            // We're going to create/write a file that contains our mesh data as a Wavefront Obj file
+            // The actual mesh will be imported from this Obj file
+            string data = mesh.data;
 
-                string fname = mesh.Attribute("filename").Value;
-                string data = mesh.Value;
+            // The data is in base64 format. We need it as a raw string.
+            string raw = ImportUtils.Base64ToString(data);
 
-                // The data is in base64 format. We need it as a raw string.
-                string raw = ImportUtils.Base64ToString(data);
-
-                // Save and import the asset
-                string pathToMesh = GetMeshAssetPath(fname);
-                ImportUtils.ReadyToWrite(pathToMesh);
-                File.WriteAllText(pathToMesh, raw, Encoding.UTF8);
-                AssetDatabase.ImportAsset(pathToMesh, ImportAssetOptions.ForceSynchronousImport);
-            }
+            // Save and import the asset
+            string pathToMesh = GetMeshAssetPath(mesh.fileName);
+            ImportUtils.ReadyToWrite(pathToMesh);
+            File.WriteAllText(pathToMesh, raw, Encoding.UTF8);
+            AssetDatabase.ImportAsset(pathToMesh, ImportAssetOptions.ForceSynchronousImport);
         }
     }
 }

@@ -8,6 +8,19 @@ using System.Xml.Linq;
 
 namespace Tiled4Unity
 {
+    [System.Serializable]
+    public struct TmxObj
+    {
+        public string fileName;
+        public string data;
+
+        public TmxObj(string fileName, string fileData)
+        {
+            this.fileName = fileName;
+            this.data = fileData;
+        }
+    }
+
     partial class TiledMapExporter
     {
         private class TmxImageComparer : IEqualityComparer<TmxImage>
@@ -21,6 +34,56 @@ namespace Tiled4Unity
             {
                 return tmxImage.AbsolutePath.GetHashCode();
             }
+        }
+
+        private TmxObj CreateMesh()
+        {
+            StringWriter objBuilder = BuildObjString();
+            return new TmxObj(this.tmxMap.Name + ".obj", StringToBase64String(objBuilder.ToString()));
+        }
+
+        private IEnumerable<TmxImage> GetImagesInLayers()
+        {
+            // Add all image files as compressed base64 strings
+            var layerImages = from layer in this.tmxMap.Layers
+                              where layer.Visible == true
+                              from rawTileId in layer.TileIds
+                              where rawTileId != 0
+                              let tileId = TmxMath.GetTileIdWithoutFlags(rawTileId)
+                              let tile = this.tmxMap.Tiles[tileId]
+                              select tile.TmxImage;
+            return layerImages;
+        }
+
+        private IEnumerable<TmxImage> GetImagesInObjects()
+        {
+            // Tile Objects may have images not yet references by a layer
+            var objectImages = from objectGroup in this.tmxMap.ObjectGroups
+                               where objectGroup.Visible == true
+                               from tmxObject in objectGroup.Objects
+                               where tmxObject.Visible == true
+                               where tmxObject is TmxObjectTile
+                               let tmxTileObject = tmxObject as TmxObjectTile
+                               from mesh in tmxTileObject.Tile.Meshes
+                               select mesh.TmxImage;
+            return objectImages;
+        }
+
+        private List<TmxImage> CreateImagesList()
+        {
+            var layerImages = GetImagesInLayers();
+            var objectImages = GetImagesInObjects();
+
+            // Combine image paths from tile layers and object layers
+            List<TmxImage> images = new List<TmxImage>();
+            images.AddRange(layerImages);
+            images.AddRange(objectImages);
+
+            // Get rid of duplicate images
+            TmxImageComparer imageComparer = new TmxImageComparer();
+            images = images.Distinct(imageComparer).ToList();
+
+            return images;
         }
 
         private List<XElement> CreateImportFilesElements(string exportToUnityProjectPath)

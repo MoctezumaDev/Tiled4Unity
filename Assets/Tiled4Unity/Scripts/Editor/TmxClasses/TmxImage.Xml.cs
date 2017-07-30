@@ -14,15 +14,17 @@ namespace Tiled4Unity
 
             try
             {
-                tmxImage.ImageBitmap = TmxHelper.FromFileBitmap32bpp(tmxImage.AbsolutePath);
+                Texture ImageBitmap = TmxHelper.FromFileBitmap32bpp(tmxImage.AbsolutePath);
+                tmxImage.Size = new Size(ImageBitmap.width, ImageBitmap.height);
             }
             catch (FileNotFoundException fnf)
             {
+                tmxImage.Size = new Size(0, 0);
                 string msg = String.Format("Image file not found: {0}", tmxImage.AbsolutePath);
                 throw new TmxException(msg, fnf);
             }
 
-            tmxImage.Size = new Size(tmxImage.ImageBitmap.width, tmxImage.ImageBitmap.height);
+            
 
             // Some images use a transparency color key instead of alpha (blerg)
             tmxImage.TransparentColor = TmxHelper.GetAttributeAsString(elemImage, "trans", "");

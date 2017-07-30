@@ -3,11 +3,19 @@ using UnityEngine;
 
 namespace Tiled4Unity
 {
+    [System.Serializable]
     public partial class TmxImage
     {
-        public string AbsolutePath { get; private set; }
-        public Size Size { get; private set; }
-        public String TransparentColor { get; set; }
-        public Texture ImageBitmap { get; private set; }
+        [SerializeField]
+        private string _absolutePath;
+        public string AbsolutePath { get { return _absolutePath; } private set { _absolutePath = value; } }
+
+        [SerializeField]
+        private Size _size;
+        public Size Size { get { return _size; } private set { _size = value; } }
+
+        [SerializeField]
+        private string _transparentColor;
+        public String TransparentColor { get { return _transparentColor; } private set { _transparentColor = value; } }
     }
 }
