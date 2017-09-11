@@ -53,10 +53,10 @@ namespace Tiled4Unity
             var staggerIndex = this.AttachedMap.StaggerIndex;
             var staggerAxis = this.AttachedMap.StaggerAxis;
             var orientation = this.AttachedMap.Orientation;
-            int hexSideLength = (orientation == TiledMap.MapOrientation.Hexagonal) ? this.AttachedMap.HexSideLength : 0;
+            int hexSideLength = (orientation == Tiled4Unity.MapOrientation.Hexagonal) ? this.AttachedMap.HexSideLength : 0;
 
             // Need to make up for stagger index and stagger axis in finding the cell found at position (0, 0)
-            if (staggerIndex == TiledMap.MapStaggerIndex.Even)
+            if (staggerIndex == Tiled4Unity.MapStaggerIndex.Even)
             {
                 // The first tile is offset by half-width in this case
                 this.StaggerPositionOffset = new Vector2(tileWidth * 0.5f, 0);
@@ -70,8 +70,8 @@ namespace Tiled4Unity
             // Figure out which axes we'll be using to determine if point is in Isometric diamond or Hexagonal cell
             // Also determine which points on the cell we'll be using to project onto the axes (as part of a Separation of Axes Theorem test)
             // These caluculations are generalized for staggered Iso and Hex (in the Iso case, 'Side Length' is always 0)
-            int sideWidth = (staggerAxis == TiledMap.MapStaggerAxis.X) ? hexSideLength : 0;
-            int sideHeight = (staggerAxis == TiledMap.MapStaggerAxis.Y) ? hexSideLength : 0;
+            int sideWidth = (staggerAxis == Tiled4Unity.MapStaggerAxis.x) ? hexSideLength : 0;
+            int sideHeight = (staggerAxis == Tiled4Unity.MapStaggerAxis.y) ? hexSideLength : 0;
 
             Vector2 hexUp = new Vector2(0, -sideHeight * 0.5f);
             Vector2 hexLeft = new Vector2(-sideWidth * 0.5f, 0);
@@ -127,7 +127,7 @@ namespace Tiled4Unity
             float pos_y = coords.y * tileHeight;
 
             // Isometric maps are special and get their 'y position' from a combination of x,y coordinates
-            if (orientation == TiledMap.MapOrientation.Isometric)
+            if (orientation == Tiled4Unity.MapOrientation.Isometric)
             {
                 pos_y = (coords.x + coords.y) * tileHeight * 0.5f;
             }
@@ -159,16 +159,16 @@ namespace Tiled4Unity
 
             var orientation = this.AttachedMap.Orientation;
 
-            if (orientation == TiledMap.MapOrientation.Orthogonal)
+            if (orientation == Tiled4Unity.MapOrientation.Orthogonal)
             {
                 coords.x = Mathf.Floor(position.x / this.AttachedMap.TileWidth);
                 coords.y = Mathf.Floor(position.y / this.AttachedMap.TileHeight);
             }
-            else if (orientation == TiledMap.MapOrientation.Isometric)
+            else if (orientation == Tiled4Unity.MapOrientation.Isometric)
             {
                 coords = ScreenToIsometric(position);
             }
-            else if (orientation == TiledMap.MapOrientation.Staggered || orientation == TiledMap.MapOrientation.Hexagonal)
+            else if (orientation == Tiled4Unity.MapOrientation.Staggered || orientation == Tiled4Unity.MapOrientation.Hexagonal)
             {
                 coords = ScreenToStaggered(position);
             }

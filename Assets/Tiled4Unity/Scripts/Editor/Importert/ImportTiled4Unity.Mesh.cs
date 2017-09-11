@@ -45,33 +45,25 @@ namespace Tiled4Unity
             }*/
         }
 
-        private void CreatePrefab(XElement xmlPrefab, string objPath)
+        private void CreatePrefab(TmxMap map, string path)
         {
-            var customImporters = GetCustomImporterInstances();
 
             // Part 1: Create the prefab
-            string prefabName = xmlPrefab.Attribute("name").Value;
-            float prefabScale = ImportUtils.GetAttributeAsFloat(xmlPrefab, "scale", 1.0f);
+            string prefabName = map.Name;
+            float prefabScale = 1.0f;
             GameObject tempPrefab = new GameObject(prefabName);
-            HandleTiledAttributes(tempPrefab, xmlPrefab);
-            HandleCustomProperties(tempPrefab, xmlPrefab, customImporters);
+            HandleTiledAttributes(tempPrefab, map);
 
             // Part 2: Build out the prefab
             // We may have an 'isTrigger' attribute that we want our children to obey
-            bool isTrigger = ImportUtils.GetAttributeAsBoolean(xmlPrefab, "isTrigger", false);
-            AddGameObjectsTo(tempPrefab, xmlPrefab, isTrigger, objPath, customImporters);
+            // bool isTrigger = ImportUtils.GetAttributeAsBoolean(xmlPrefab, "isTrigger", false);
+            AddGameObjectsTo(tempPrefab, map);
 
-            // Part 3: Allow for customization from other editor scripts to be made on the prefab
-            // (These are generally for game-specific needs)
-            CustomizePrefab(tempPrefab, customImporters);
-
-            // Part 3.5: Apply the scale only after all children have been added
+            // Part 3: Apply the scale only after all children have been added
             tempPrefab.transform.localScale = new Vector3(prefabScale, prefabScale, prefabScale);
 
             // Part 4: Save the prefab, keeping references intact.
-            string resourcePath = ImportUtils.GetAttributeAsString(xmlPrefab, "resourcePath", "");
-            bool isResource = !String.IsNullOrEmpty(resourcePath) || ImportUtils.GetAttributeAsBoolean(xmlPrefab, "resource", false);
-            string prefabPath = GetPrefabAssetPath(prefabName, isResource, resourcePath);
+            string prefabPath = GetPrefabAssetPath(prefabName, true, "");
             UnityEngine.Object finalPrefab = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject));
 
             if (finalPrefab == null)
@@ -88,7 +80,85 @@ namespace Tiled4Unity
             UnityEngine.Object.DestroyImmediate(tempPrefab);
         }
 
-        private void AddGameObjectsTo(GameObject parent, XElement xml, bool isParentTrigger, string objPath, IList<ICustomTiledImporter> customImporters)
+        private void ApplySortingLayer(GameObject child, string sortingLayer)
+        {
+            // Apply the sorting to the renderer of the mesh object we just copied into the child
+            Renderer renderer = child.GetComponent<Renderer>();
+            
+            if (!String.IsNullOrEmpty(sortingLayer) && !SortingLayerExposedEditor.GetSortingLayerNames().Contains(sortingLayer))
+            {
+                Debug.LogError(string.Format("Sorting Layer \"{0}\" does not exist. Check your Project Settings -> Tags and Layers", sortingLayer));
+                renderer.sortingLayerName = "Default";
+            }
+            else
+            {
+                renderer.sortingLayerName = sortingLayer;
+            }
+        }
+
+        private List<GameObject> CreateMeshElementsForLayer(TmxLayer layer)
+        {
+            List<GameObject> meshes = new List<GameObject>();
+
+            foreach (TmxMesh mesh in layer.Meshes)
+            {
+                GameObject go = new GameObject(mesh.UniqueMeshName);
+
+                ApplySortingLayer(go, layer.SortingLayerName);
+
+                GameObject goMesh = CreateCopyFromMeshObj(mesh.ObjectName, "", layer.Opacity);
+                goMesh.transform.SetParent(go.transform, false);
+
+                if (mesh.FullAnimationDurationMs > 0)
+                {
+                    AddTileAnimatorsTo(goMesh, mesh);
+                }
+
+                meshes.Add(go);
+            }
+
+            return meshes;
+        }
+
+        private void AddGameObjectsTo(GameObject parent, TmxMap map)
+        {
+            foreach(TmxLayer layer in map.Layers)
+            {
+                float depth_z = 0;
+                if (Settings.DepthBufferEnabled && layer.SortingOrder != 0)
+                {
+                    float mapLogicalHeight = map.MapSizeInPixels().Height;
+                    float tileHeight = map.TileHeight;
+
+                    depth_z = layer.SortingOrder * tileHeight / mapLogicalHeight * -1.0f;
+                }
+
+                GameObject goLayer = new GameObject(layer.Name);
+                goLayer.transform.SetParent(parent.transform, false);
+                goLayer.transform.localPosition = new Vector3(layer.Offset.x, layer.Offset.y, depth_z);
+
+                if (layer.Ignore != TmxLayer.IgnoreSettings.Visual)
+                {
+                    // Submeshes for the layer (layer+material)
+                    // var meshElements = CreateMeshElementsForLayer(layer);
+                    // layerElement.Add(meshElements);
+                    CreateMeshElementsForLayer(layer);
+                }
+
+
+                // Collision data for the layer
+                if (layer.Ignore != TmxLayer.IgnoreSettings.Collision)
+                {
+                    // foreach (var collisionLayer in layer.CollisionLayers)
+                    // {
+                        //var collisionElements = CreateCollisionElementForLayer(collisionLayer);
+                        //layerElement.Add(collisionElements);
+                    //}
+                }
+            }
+        }
+
+        /*private void AddGameObjectsTo(GameObject parent, XElement xml, string obj)
         {
             foreach (XElement goXml in xml.Elements("GameObject"))
             {
@@ -159,9 +229,6 @@ namespace Tiled4Unity
                 // Does this game object have a layer?
                 AssignLayerTo(child, goXml);
 
-                // Are there any custom properties?
-                HandleCustomProperties(child, goXml, customImporters);
-
                 // Set scale and rotation *after* children are added otherwise Unity will have child+parent transform cancel each other out
                 float sx = ImportUtils.GetAttributeAsFloat(goXml, "scaleX", 1.0f);
                 float sy = ImportUtils.GetAttributeAsFloat(goXml, "scaleY", 1.0f);
@@ -175,11 +242,10 @@ namespace Tiled4Unity
                 localRotation.z = -ImportUtils.GetAttributeAsFloat(goXml, "rotation", 0);
                 child.transform.eulerAngles = localRotation;
             }
-        }
+        }*/
 
-        private void AssignLayerTo(GameObject gameObject, XElement xml)
+        private void AssignLayerTo(GameObject gameObject, string layerName)
         {
-            string layerName = ImportUtils.GetAttributeAsString(xml, "layer", "");
             if (String.IsNullOrEmpty(layerName))
                 return;
 
@@ -398,94 +464,30 @@ namespace Tiled4Unity
             return null;
         }
 
-        private void AddTileAnimatorsTo(GameObject gameObject, XElement goXml)
+        private void AddTileAnimatorsTo(GameObject gameObject, TmxMesh mesh)
         {
-            // This object will only visible for a given moment of time within an animation
-            var animXml = goXml.Element("TileAnimator");
-            if (animXml != null)
-            {
-                TileAnimator tileAnimator = gameObject.AddComponent<TileAnimator>();
-                tileAnimator.StartTime = ImportUtils.GetAttributeAsInt(animXml, "startTimeMs") * 0.001f;
-                tileAnimator.Duration = ImportUtils.GetAttributeAsInt(animXml, "durationMs") * 0.001f;
-                tileAnimator.TotalAnimationTime = ImportUtils.GetAttributeAsInt(animXml, "fullTimeMs") * 0.001f;
-            }
+            TileAnimator tileAnimator = gameObject.AddComponent<TileAnimator>();
+            tileAnimator.StartTime = mesh.StartTimeMs * 0.001f;
+            tileAnimator.Duration = mesh.DurationMs * 0.001f;
+            tileAnimator.TotalAnimationTime = mesh.FullAnimationDurationMs * 0.001f;
         }
 
-        private void HandleTiledAttributes(GameObject gameObject, XElement goXml)
+        private void HandleTiledAttributes(GameObject gameObject, TmxMap tmxMap)
         {
             // Add the TiledMap component
             TiledMap map = gameObject.AddComponent<TiledMap>();
-            try
-            {
-                map.Orientation = ImportUtils.GetAttributeAsEnum<TiledMap.MapOrientation>(goXml, "orientation");
-                map.StaggerAxis = ImportUtils.GetAttributeAsEnum<TiledMap.MapStaggerAxis>(goXml, "staggerAxis");
-                map.StaggerIndex = ImportUtils.GetAttributeAsEnum<TiledMap.MapStaggerIndex>(goXml, "staggerIndex");
-                map.HexSideLength = ImportUtils.GetAttributeAsInt(goXml, "hexSideLength");
-                map.NumLayers = ImportUtils.GetAttributeAsInt(goXml, "numLayers");
-                map.NumTilesWide = ImportUtils.GetAttributeAsInt(goXml, "numTilesWide");
-                map.NumTilesHigh = ImportUtils.GetAttributeAsInt(goXml, "numTilesHigh");
-                map.TileWidth = ImportUtils.GetAttributeAsInt(goXml, "tileWidth");
-                map.TileHeight = ImportUtils.GetAttributeAsInt(goXml, "tileHeight");
-                map.ExportScale = ImportUtils.GetAttributeAsFloat(goXml, "exportScale");
-                map.MapWidthInPixels = ImportUtils.GetAttributeAsInt(goXml, "mapWidthInPixels");
-                map.MapHeightInPixels = ImportUtils.GetAttributeAsInt(goXml, "mapHeightInPixels");
-            }
-            catch
-            {
-                Debug.LogWarning(String.Format("Error adding TiledMap component. Are you using an old version of Tiled4Unity in your Unity project?"));
-                GameObject.DestroyImmediate(map);
-            }
-        }
-
-        private void HandleCustomProperties(GameObject gameObject, XElement goXml, IList<ICustomTiledImporter> importers)
-        {
-            var props = from p in goXml.Elements("Property")
-                        select new { Name = p.Attribute("name").Value, Value = p.Attribute("value").Value };
-
-            if (props.Count() > 0)
-            {
-                var dictionary = props.OrderBy(p => p.Name).ToDictionary(p => p.Name, p => p.Value);
-                foreach (ICustomTiledImporter importer in importers)
-                {
-                    importer.HandleCustomProperties(gameObject, dictionary);
-                }
-            }
-        }
-
-        private void CustomizePrefab(GameObject prefab, IList<ICustomTiledImporter> importers)
-        {
-            foreach (ICustomTiledImporter importer in importers)
-            {
-                importer.CustomizePrefab(prefab);
-            }
-        }
-
-        private IList<ICustomTiledImporter> GetCustomImporterInstances()
-        {
-            // Report an error for ICustomTiledImporter classes that don't have the CustomTiledImporterAttribute
-            var errorTypes = from a in AppDomain.CurrentDomain.GetAssemblies()
-                             from t in a.GetTypes()
-                             where typeof(ICustomTiledImporter).IsAssignableFrom(t)
-                             where !t.IsAbstract
-                             where System.Attribute.GetCustomAttribute(t, typeof(CustomTiledImporterAttribute)) == null
-                             select t;
-            foreach (var t in errorTypes)
-            {
-                Debug.LogError(String.Format("ICustomTiledImporter type '{0}' is missing CustomTiledImporterAttribute", t));
-            }
-
-            // Find all the types with the CustomTiledImporterAttribute, instantiate them, and give them a chance to customize our prefab
-            var types = from a in AppDomain.CurrentDomain.GetAssemblies()
-                        from t in a.GetTypes()
-                        where typeof(ICustomTiledImporter).IsAssignableFrom(t)
-                        where !t.IsAbstract
-                        from attr in System.Attribute.GetCustomAttributes(t, typeof(CustomTiledImporterAttribute))
-                        let custom = attr as CustomTiledImporterAttribute
-                        orderby custom.Order
-                        select t;
-
-            var instances = types.Select(t => (ICustomTiledImporter)Activator.CreateInstance(t));
-            return instances.ToList();
+            map.Orientation = tmxMap.Orientation;
+            map.StaggerAxis = tmxMap.StaggerAxis;
+            map.StaggerIndex = tmxMap.StaggerIndex;
+            map.HexSideLength = tmxMap.HexSideLength;
+            map.NumLayers = tmxMap.Layers.Count;
+            map.NumTilesWide = tmxMap.Width;
+            map.NumTilesHigh = tmxMap.Height;
+            map.TileWidth = tmxMap.TileWidth;
+            map.TileHeight = tmxMap.TileHeight;
+            map.ExportScale = 1.0f;
+            map.MapWidthInPixels = tmxMap.MapSizeInPixels().Width;
+            map.MapHeightInPixels = tmxMap.MapSizeInPixels().Height;
         }
 
     } // end class

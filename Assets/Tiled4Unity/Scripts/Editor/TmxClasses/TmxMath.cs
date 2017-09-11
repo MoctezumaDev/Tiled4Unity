@@ -121,16 +121,16 @@ namespace Tiled4Unity
 
         static public bool DoStaggerX(TmxMap tmxMap, int x)
         {
-            int staggerX = (tmxMap.StaggerAxis == TmxMap.MapStaggerAxis.x) ? 1 : 0;
-            int staggerEven = (tmxMap.StaggerIndex == TmxMap.MapStaggerIndex.Even) ? 1 : 0;
+            int staggerX = (tmxMap.StaggerAxis == Tiled4Unity.MapStaggerAxis.x) ? 1 : 0;
+            int staggerEven = (tmxMap.StaggerIndex == Tiled4Unity.MapStaggerIndex.Even) ? 1 : 0;
 
             return staggerX != 0 && ((x & 1) ^ staggerEven) != 0;
         }
 
         static public bool DoStaggerY(TmxMap tmxMap, int y)
         {
-            int staggerX = (tmxMap.StaggerAxis == TmxMap.MapStaggerAxis.x) ? 1 : 0;
-            int staggerEven = (tmxMap.StaggerIndex == TmxMap.MapStaggerIndex.Even) ? 1 : 0;
+            int staggerX = (tmxMap.StaggerAxis == Tiled4Unity.MapStaggerAxis.x) ? 1 : 0;
+            int staggerEven = (tmxMap.StaggerIndex == Tiled4Unity.MapStaggerIndex.Even) ? 1 : 0;
 
             return staggerX == 0 && ((y & 1) ^ staggerEven) != 0;
         }
@@ -139,7 +139,7 @@ namespace Tiled4Unity
         {
             // Support different map display types (orthographic, isometric, etc..)
             // Note: simulates "tileToScreenCoords" function from Tiled source
-            if (tmxMap.Orientation == TmxMap.MapOrientation.Isometric)
+            if (tmxMap.Orientation == Tiled4Unity.MapOrientation.Isometric)
             {
                 Vector2 Vector2 = Vector2.zero;
 
@@ -151,15 +151,15 @@ namespace Tiled4Unity
 
                 return point;
             }
-            else if (tmxMap.Orientation == TmxMap.MapOrientation.Staggered || tmxMap.Orientation == TmxMap.MapOrientation.Hexagonal)
+            else if (tmxMap.Orientation == Tiled4Unity.MapOrientation.Staggered || tmxMap.Orientation == Tiled4Unity.MapOrientation.Hexagonal)
             {
                 Vector2 point = Vector2.zero;
 
                 int tileWidth = tmxMap.TileWidth & ~1;
                 int tileHeight = tmxMap.TileHeight & ~1;
 
-                int sideLengthX = tmxMap.StaggerAxis == TmxMap.MapStaggerAxis.x ? tmxMap.HexSideLength : 0;
-                int sideLengthY = tmxMap.StaggerAxis == TmxMap.MapStaggerAxis.y ? tmxMap.HexSideLength : 0;
+                int sideLengthX = tmxMap.StaggerAxis == Tiled4Unity.MapStaggerAxis.x ? tmxMap.HexSideLength : 0;
+                int sideLengthY = tmxMap.StaggerAxis == Tiled4Unity.MapStaggerAxis.y ? tmxMap.HexSideLength : 0;
 
                 int sideOffsetX = (tileWidth - sideLengthX) / 2;
                 int sideOffsetY = (tileHeight - sideLengthY) / 2;
@@ -167,7 +167,7 @@ namespace Tiled4Unity
                 int columnWidth = sideOffsetX + sideLengthX;
                 int rowHeight = sideOffsetY + sideLengthY;
 
-                if (tmxMap.StaggerAxis == TmxMap.MapStaggerAxis.x)
+                if (tmxMap.StaggerAxis == Tiled4Unity.MapStaggerAxis.x)
                 {
                     point.y = y * (tileHeight + sideLengthY);
                     if (TmxMath.DoStaggerX(tmxMap, x))
@@ -201,7 +201,7 @@ namespace Tiled4Unity
         {
             Vector2 point = TileCornerInGridCoordinates(tmxMap, x, y);
 
-            if (tmxMap.Orientation != TmxMap.MapOrientation.Orthogonal)
+            if (tmxMap.Orientation != Tiled4Unity.MapOrientation.Orthogonal)
             {
                 Vector2 offset = new Vector2(-tmxMap.TileWidth / 2, 0);
                 point = point + offset;
@@ -217,7 +217,7 @@ namespace Tiled4Unity
 
         static public Vector2 ObjectVector2ToMapSpace(TmxMap tmxMap, Vector2 pt)
         {
-            if (tmxMap.Orientation == TmxMap.MapOrientation.Isometric)
+            if (tmxMap.Orientation == Tiled4Unity.MapOrientation.Isometric)
             {
                 Vector2 xf = Vector2.zero;
 

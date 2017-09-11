@@ -7,30 +7,31 @@ using UnityEngine;
 
 namespace Tiled4Unity
 {
+    public enum MapOrientation
+    {
+        Orthogonal,
+        Isometric,
+        Staggered,
+        Hexagonal,
+    }
+
+    public enum MapStaggerAxis
+    {
+        x,
+        y,
+    }
+
+    public enum MapStaggerIndex
+    {
+        Odd,
+        Even,
+    }
+
     public class TiledMap : MonoBehaviour
     {
-        public enum MapOrientation
-        {
-            Orthogonal,
-            Isometric,
-            Staggered,
-            Hexagonal,
-        }
-
-        public enum MapStaggerAxis
-        {
-            X,
-            Y,
-        }
-
-        public enum MapStaggerIndex
-        {
-            Odd,
-            Even,
-        }
 
         public MapOrientation Orientation = MapOrientation.Orthogonal;
-        public MapStaggerAxis StaggerAxis = MapStaggerAxis.X;
+        public MapStaggerAxis StaggerAxis = MapStaggerAxis.x;
         public MapStaggerIndex StaggerIndex = MapStaggerIndex.Odd;
         public int HexSideLength = 0;
 

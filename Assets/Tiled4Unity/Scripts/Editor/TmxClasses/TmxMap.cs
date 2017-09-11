@@ -10,26 +10,6 @@ namespace Tiled4Unity
 {
     public partial class TmxMap : TmxHasProperties
     {
-        public enum MapOrientation
-        {
-            Orthogonal,
-            Isometric,
-            Staggered,
-            Hexagonal,
-        }
-
-        public enum MapStaggerAxis
-        {
-            x,
-            y,
-        }
-
-        public enum MapStaggerIndex
-        {
-            Odd,
-            Even,
-        }
-
         public bool IsLoaded { get; private set; }
 
         public string Name { get; private set; }

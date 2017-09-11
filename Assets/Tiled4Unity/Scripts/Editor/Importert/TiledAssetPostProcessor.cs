@@ -67,22 +67,22 @@ namespace Tiled4Unity
                     continue;
                 }
 
-                using (ImportTiled4Unity t2uImporter = new ImportTiled4Unity(imported))
+                using (ImportTiled4Unity t4uImporter = new ImportTiled4Unity(imported))
                 {
-                    if (t2uImporter.IsTiled4UnityTexture())
+                    if (t4uImporter.IsTiled4UnityTexture())
                     {
                         // A texture was imported and the material assigned to it may need to be fixed
-                        t2uImporter.TextureImported(imported);
+                        t4uImporter.TextureImported(imported);
                     }
-                    else if (t2uImporter.IsTiled4UnityWavefrontObj())
+                    else if (t4uImporter.IsTiled4UnityWavefrontObj())
                     {
                         // Now that the mesh has been imported we will build the prefab
-                        t2uImporter.MeshImported(imported);
+                        t4uImporter.MeshImported(imported);
                     }
-                    else if (t2uImporter.IsTiled4UnityPrefab())
+                    else if (t4uImporter.IsTiled4UnityPrefab())
                     {
                         // Now the the prefab is built and imported we are done
-                        t2uImporter.ImportFinished(imported);
+                        t4uImporter.ImportFinished(imported);
                         Debug.Log(string.Format("Imported prefab from Tiled map editor: {0}", imported));
                     }
                 }

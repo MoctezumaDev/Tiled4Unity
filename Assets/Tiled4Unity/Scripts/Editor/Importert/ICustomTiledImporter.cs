@@ -5,7 +5,8 @@ using System.Text;
 
 using UnityEngine;
 
-namespace Tiled4Unity
+//TODO: Leon delete custom importer repalce them with importer hooks
+/*namespace Tiled4Unity
 {
     interface ICustomTiledImporter
     {
@@ -17,7 +18,7 @@ namespace Tiled4Unity
         // A last chance opporunity to modify it through script
         void CustomizePrefab(GameObject prefab);
     }
-}
+}*/
 
 // Examples
 /*

@@ -18,16 +18,6 @@ namespace Tiled4Unity
     // Concentrates on the Xml file being imported
     partial class ImportTiled4Unity
     {
-        // Called when Unity detects the *.tiled4unity.xml file needs to be (re)imported
-        public void ImportBegin(TmxObj mesh, List<TmxImage> images, List<MeshMaterial> materials)
-        {
-            // Import asset files.
-            // (Note that textures should be imported before meshes)
-            // ImportTexturesFromXml(xml); //TODO: recover internal textures
-            CreateMaterialsFromInternalTextures(images);
-            CreateMesh(mesh);
-        }
-
         // Called when the import process has completed and we have a prefab ready to go
         public void ImportFinished(string prefabPath)
         {
@@ -41,40 +31,9 @@ namespace Tiled4Unity
             ImportXMLHelper.RemovePath(importBehaviour.ImportName);
         }
 
-        //Todo recover internal texture
-        /*private void ImportTexturesFromXml(XDocument xml)
+        public List<Material> CreateMaterialsFromInternalTextures(List<TmxImage> images)
         {
-            var texData = xml.Root.Elements("ImportTexture");
-            foreach (var tex in texData)
-            {
-                string name = tex.Attribute("filename").Value;
-                string data = tex.Value;
-
-                // The data is gzip compressed base64 string. We need the raw bytes.
-                //byte[] bytes = ImportUtils.GzipBase64ToBytes(data);
-                byte[] bytes = ImportUtils.Base64ToBytes(data);
-
-                // Save and import the texture asset
-                {
-                    string pathToSave = GetTextureAssetPath(name);
-                    ImportUtils.ReadyToWrite(pathToSave);
-                    File.WriteAllBytes(pathToSave, bytes);
-                    AssetDatabase.ImportAsset(pathToSave, ImportAssetOptions.ForceSynchronousImport);
-                }
-
-                // Create a material in prepartion for the texture being successfully imported
-                {
-                    // We need to recreate the material every time because the Tiled Map may have changed
-                    string materialPath = GetMaterialAssetPath(name);
-                    Material material = CreateMaterialFromXml(tex);
-                    ImportUtils.ReadyToWrite(materialPath);
-                    ImportUtils.CreateOrReplaceAsset(material, materialPath);
-                }
-            }
-        }*/
-
-        private void CreateMaterialsFromInternalTextures(List<TmxImage> images)
-        {
+            List<Material> materials = new List<Material>();
             foreach (var image in images)
             {
                 bool isInternal = File.Exists(Path.ChangeExtension(image.AbsolutePath, "meta"));
@@ -104,9 +63,11 @@ namespace Tiled4Unity
 
                     // Write the material to our asset database
                     ImportUtils.ReadyToWrite(materialPath);
-                    ImportUtils.CreateOrReplaceAsset(material, materialPath);
+                    Material newMaterial = ImportUtils.CreateOrReplaceAsset(material, materialPath);
+                    materials.Add(material);
                 }
             }
+            return materials;
         }
 
         private Material CreateMaterial(string htmlColor, bool usesDepthShader)
@@ -146,7 +107,7 @@ namespace Tiled4Unity
             return material;
         }
 
-        private void CreateMesh(TmxObj mesh)
+        public ModelImporter CreateMesh(TmxObj mesh)
         {
             // We're going to create/write a file that contains our mesh data as a Wavefront Obj file
             // The actual mesh will be imported from this Obj file
@@ -160,6 +121,8 @@ namespace Tiled4Unity
             ImportUtils.ReadyToWrite(pathToMesh);
             File.WriteAllText(pathToMesh, raw, Encoding.UTF8);
             AssetDatabase.ImportAsset(pathToMesh, ImportAssetOptions.ForceSynchronousImport);
+            ModelImporter importer = AssetImporter.GetAtPath(pathToMesh) as ModelImporter;
+            return importer;
         }
     }
 }

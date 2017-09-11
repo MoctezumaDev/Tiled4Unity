@@ -77,7 +77,8 @@ namespace Tiled4Unity
 
             using (ImportTiled4Unity t4uImporter = new ImportTiled4Unity(pathToSave))
             {
-                t4uImporter.ImportBegin(mesh, images, meshMaterials);
+                t4uImporter.CreateMaterialsFromInternalTextures(images);
+                t4uImporter.CreateMesh(mesh);
                 AssetDatabase.Refresh();
             }
         }

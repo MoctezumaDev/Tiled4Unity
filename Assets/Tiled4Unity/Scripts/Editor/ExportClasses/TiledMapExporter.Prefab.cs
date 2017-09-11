@@ -216,7 +216,7 @@ namespace Tiled4Unity
 
                 if (tmxObject.GetType() == typeof(TmxObjectRectangle))
                 {
-                    if (this.tmxMap.Orientation == TmxMap.MapOrientation.Isometric)
+                    if (this.tmxMap.Orientation == Tiled4Unity.MapOrientation.Isometric)
                     {
                         TmxObjectPolygon tmxIsometricRectangle = TmxObjectPolygon.FromRectangle(this.tmxMap, tmxObject as TmxObjectRectangle);
                         objElement = CreatePolygonColliderElement(tmxIsometricRectangle);
@@ -241,7 +241,7 @@ namespace Tiled4Unity
                 else if (tmxObject.GetType() == typeof(TmxObjectTile))
                 {
                     // TileObjects are off by a half-width in Isometric mode
-                    if (this.tmxMap.Orientation == TmxMap.MapOrientation.Isometric)
+                    if (this.tmxMap.Orientation == Tiled4Unity.MapOrientation.Isometric)
                     {
                         xmlObject.SetAttributeValue("x", pos.x - this.tmxMap.TileWidth * 0.5f * Settings.Scale);
                     }
@@ -472,7 +472,7 @@ namespace Tiled4Unity
 
         private XElement CreateCircleColliderElement(TmxObjectEllipse tmxEllipse, string objGroupName)
         {
-            if (this.tmxMap.Orientation == TmxMap.MapOrientation.Isometric)
+            if (this.tmxMap.Orientation == Tiled4Unity.MapOrientation.Isometric)
             {
                 Console.WriteLine("Collision ellipse in Object Layer '{0}' is not supported in Isometric maps: {1}", objGroupName, tmxEllipse);
                 return null;
@@ -544,8 +544,8 @@ namespace Tiled4Unity
 
             // Add any colliders that might be on the tile
             // Note: Colliders on a tile object are always treated as if they are in Orthogonal space
-            TmxMap.MapOrientation restoreOrientation = tmxMap.Orientation;
-            this.tmxMap.Orientation = TmxMap.MapOrientation.Orthogonal;
+            Tiled4Unity.MapOrientation restoreOrientation = tmxMap.Orientation;
+            this.tmxMap.Orientation = Tiled4Unity.MapOrientation.Orthogonal;
             {
                 foreach (TmxObject tmxObject in tmxObjectTile.Tile.ObjectGroup.Objects)
                 {
